@@ -86,7 +86,6 @@
 
       Hub.prototype.emit = function(e, payload) {
         var listener, _i, _len, _ref, _results;
-        console.log(template(e, payload));
         if (this.listeners[e] == null) {
           return;
         }

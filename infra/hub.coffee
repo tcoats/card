@@ -38,7 +38,7 @@ define ['infra/template'], (template) ->
 		
 		# Publish an event
 		emit: (e, payload) =>
-			console.log template e, payload
+			#console.log template e, payload
 			
 			return if !@listeners[e]?
 			for listener in @listeners[e].slice()

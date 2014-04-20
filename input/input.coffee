@@ -1,17 +1,35 @@
-define ['infra/hub', 'infra/delay'], (hub, delay) ->
+define ['infra/hub', 'readline'], (hub, readline) ->
 	class Input
 		constructor: ->
-			hub.on 'Player 1 choose deck', @player1ChooseDeck
-			hub.on 'Player 2 choose deck', @player2ChooseDeck
-			hub.on 'Randomly select starting player', @randomlySelectStartingPlayer
-		
-		player1ChooseDeck: =>
-			delay 500, -> hub.emit 'Player 1 has chosen {deck} deck', deck: 'Aggro'
-		
-		player2ChooseDeck: =>
-			delay 500, -> hub.emit 'Player 2 has chosen {deck} deck', deck: 'Control'
+			@rl = readline.createInterface
+				input: process.stdin
+				output: process.stdout
 			
-		randomlySelectStartingPlayer: =>
-			delay 500, -> hub.emit 'Player 2 will start'
-
+			hub.on 'Randomly select starting player', ->
+				hub.emit 'Player 2 will start'
+			
+			hub.on 'Player 1 select from options', @selectfromoptions
+			hub.on 'Player 2 select from options', @selectfromoptions
+				
+			hub.on 'Game quit', =>
+				@rl.close()
+		
+		selectfromoptions: (options) =>
+			hub.emit 'error', 'No options present' if options.length is 0
+			return options[0]() if options.length is 1
+			
+			index = 0
+			selection = []
+			for option, cb of options
+				selection[index] = cb
+				console.log "#{index + 1}) #{option}"
+				index++
+			
+			@getselection options.length, (index) =>
+				selection[index]()
+		
+		getselection: (max, cb) =>
+			@rl.question '? ', (index) =>
+				cb(index - 1)
+				
 	new Input()

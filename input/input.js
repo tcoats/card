@@ -2,38 +2,57 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['infra/hub', 'infra/delay'], function(hub, delay) {
+  define(['infra/hub', 'readline'], function(hub, readline) {
     var Input;
     Input = (function() {
       function Input() {
-        this.randomlySelectStartingPlayer = __bind(this.randomlySelectStartingPlayer, this);
-        this.player2ChooseDeck = __bind(this.player2ChooseDeck, this);
-        this.player1ChooseDeck = __bind(this.player1ChooseDeck, this);
-        hub.on('Player 1 choose deck', this.player1ChooseDeck);
-        hub.on('Player 2 choose deck', this.player2ChooseDeck);
-        hub.on('Randomly select starting player', this.randomlySelectStartingPlayer);
-      }
-
-      Input.prototype.player1ChooseDeck = function() {
-        return delay(500, function() {
-          return hub.emit('Player 1 has chosen {deck} deck', {
-            deck: 'Aggro'
-          });
+        this.getselection = __bind(this.getselection, this);
+        this.selectfromoptions = __bind(this.selectfromoptions, this);
+        this.rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
         });
-      };
-
-      Input.prototype.player2ChooseDeck = function() {
-        return delay(500, function() {
-          return hub.emit('Player 2 has chosen {deck} deck', {
-            deck: 'Control'
-          });
-        });
-      };
-
-      Input.prototype.randomlySelectStartingPlayer = function() {
-        return delay(500, function() {
+        hub.on('Randomly select starting player', function() {
           return hub.emit('Player 2 will start');
         });
+        hub.on('Player 1 select from options', this.selectfromoptions);
+        hub.on('Player 2 select from options', this.selectfromoptions);
+        hub.on('Game quit', (function(_this) {
+          return function() {
+            return _this.rl.close();
+          };
+        })(this));
+      }
+
+      Input.prototype.selectfromoptions = function(options) {
+        var cb, index, option, selection;
+        if (options.length === 0) {
+          hub.emit('error', 'No options present');
+        }
+        if (options.length === 1) {
+          return options[0]();
+        }
+        index = 0;
+        selection = [];
+        for (option in options) {
+          cb = options[option];
+          selection[index] = cb;
+          console.log("" + (index + 1) + ") " + option);
+          index++;
+        }
+        return this.getselection(options.length, (function(_this) {
+          return function(index) {
+            return selection[index]();
+          };
+        })(this));
+      };
+
+      Input.prototype.getselection = function(max, cb) {
+        return this.rl.question('? ', (function(_this) {
+          return function(index) {
+            return cb(index - 1);
+          };
+        })(this));
       };
 
       return Input;
