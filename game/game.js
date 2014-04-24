@@ -4,14 +4,17 @@
     var Game;
     Game = (function() {
       function Game() {
-        hub.saga(['Game start'], function() {
+        hub.once('Game start', function() {
           return hub.emit('Player 1 choose deck');
         });
-        hub.saga(['Player 1 has chosen {deck} deck'], function() {
+        hub.once('Player 1 has chosen {deck} deck', function() {
           return hub.emit('Player 2 choose deck');
         });
-        hub.saga(['Player 1 has chosen {deck} deck', 'Player 2 has chosen {deck} deck'], function() {
+        hub.once(['Player 1 has chosen {deck} deck', 'Player 2 has chosen {deck} deck'], function() {
           return hub.emit('Randomly select starting player');
+        });
+        hub.once('Player 2 will start', function() {
+          return console.log('Player 2 starting');
         });
       }
 

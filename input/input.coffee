@@ -5,13 +5,13 @@ define ['infra/hub', 'readline'], (hub, readline) ->
 				input: process.stdin
 				output: process.stdout
 			
-			hub.on 'Randomly select starting player', ->
+			hub.every 'Randomly select starting player', ->
 				hub.emit 'Player 2 will start'
 			
-			hub.on 'Player 1 select from options', @selectfromoptions
-			hub.on 'Player 2 select from options', @selectfromoptions
+			hub.every 'Player 1 select from options', @selectfromoptions
+			hub.every 'Player 2 select from options', @selectfromoptions
 				
-			hub.on 'Game quit', =>
+			hub.every 'Game quit', =>
 				@rl.close()
 		
 		selectfromoptions: (options) =>

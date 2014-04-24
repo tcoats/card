@@ -5,19 +5,19 @@
     Decks = (function() {
       function Decks() {
         this.decks = {};
-        hub.on('{deck} deck has been created', (function(_this) {
+        hub.every('{deck} deck has been created', (function(_this) {
           return function(p) {
             return _this.decks[p.deck] = {
               deck: p.deck
             };
           };
         })(this));
-        hub.on('{deck} deck has new cards {cards}', (function(_this) {
+        hub.every('{deck} deck has new cards {cards}', (function(_this) {
           return function(p) {
             return _this.decks[p.deck].cards = p.cards;
           };
         })(this));
-        hub.on('Player 1 choose deck', (function(_this) {
+        hub.every('Player 1 choose deck', (function(_this) {
           return function() {
             var add, deck, name, options, _ref;
             options = {};
@@ -37,7 +37,7 @@
             return hub.emit('Player 1 select from options', options);
           };
         })(this));
-        hub.on('Player 2 choose deck', (function(_this) {
+        hub.every('Player 2 choose deck', (function(_this) {
           return function() {
             var add, deck, name, options, _ref;
             options = {};

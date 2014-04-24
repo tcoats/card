@@ -7,12 +7,15 @@
     Hub = (function() {
       function Hub() {
         this.emit = __bind(this.emit, this);
-        this.one = __bind(this.one, this);
-        this.on = __bind(this.on, this);
+        this.any = __bind(this.any, this);
+        this.once = __bind(this.once, this);
+        this._once = __bind(this._once, this);
+        this.every = __bind(this.every, this);
+        this._every = __bind(this._every, this);
         this.listeners = {};
       }
 
-      Hub.prototype.on = function(e, cb) {
+      Hub.prototype._every = function(e, cb) {
         if (this.listeners[e] == null) {
           this.listeners[e] = [];
         }
@@ -30,9 +33,44 @@
         };
       };
 
-      Hub.prototype.one = function(e, cb) {
+      Hub.prototype.every = function(events, cb) {
+        var bindings, e, _i, _len;
+        if (!(events instanceof Array)) {
+          events = [events];
+        }
+        bindings = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = events.length; _i < _len; _i++) {
+            e = events[_i];
+            _results.push({
+              event: e
+            });
+          }
+          return _results;
+        })();
+        for (_i = 0, _len = bindings.length; _i < _len; _i++) {
+          e = bindings[_i];
+          e.binding = this._every(e.event, cb);
+        }
+        return {
+          off: (function(_this) {
+            return function() {
+              var _j, _len1, _results;
+              _results = [];
+              for (_j = 0, _len1 = bindings.length; _j < _len1; _j++) {
+                e = bindings[_j];
+                _results.push(e.binding.off());
+              }
+              return _results;
+            };
+          })(this)
+        };
+      };
+
+      Hub.prototype._once = function(e, cb) {
         var binding;
-        binding = this.on(e, (function(_this) {
+        binding = this.every(e, (function(_this) {
           return function(payload) {
             binding.off();
             return cb(payload);
@@ -45,8 +83,11 @@
         };
       };
 
-      Hub.prototype.saga = function(events, cb) {
+      Hub.prototype.once = function(events, cb) {
         var bindings, count, e, _i, _len;
+        if (!(events instanceof Array)) {
+          events = [events];
+        }
         count = 0;
         bindings = (function() {
           var _i, _len, _results;
@@ -63,7 +104,7 @@
         })();
         for (_i = 0, _len = bindings.length; _i < _len; _i++) {
           e = bindings[_i];
-          e.binding = this.one(e.event, function() {
+          e.binding = this._once(e.event, function() {
             count--;
             e.complete = true;
             if (count === 0) {
@@ -84,8 +125,43 @@
         };
       };
 
+      Hub.prototype.any = function(events, cb) {
+        var bindings, e, unbind, _i, _len;
+        bindings = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = events.length; _i < _len; _i++) {
+            e = events[_i];
+            _results.push({
+              event: e
+            });
+          }
+          return _results;
+        })();
+        unbind = function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = bindings.length; _i < _len; _i++) {
+            e = bindings[_i];
+            _results.push(e.binding.off());
+          }
+          return _results;
+        };
+        for (_i = 0, _len = bindings.length; _i < _len; _i++) {
+          e = bindings[_i];
+          e.binding = this._once(e.event, function() {
+            unbind();
+            return cb();
+          });
+        }
+        return {
+          off: unbind
+        };
+      };
+
       Hub.prototype.emit = function(e, payload) {
         var listener, _i, _len, _ref, _results;
+        console.log(" - " + (template(e, payload)));
         if (this.listeners[e] == null) {
           return;
         }

@@ -12,12 +12,12 @@
           input: process.stdin,
           output: process.stdout
         });
-        hub.on('Randomly select starting player', function() {
+        hub.every('Randomly select starting player', function() {
           return hub.emit('Player 2 will start');
         });
-        hub.on('Player 1 select from options', this.selectfromoptions);
-        hub.on('Player 2 select from options', this.selectfromoptions);
-        hub.on('Game quit', (function(_this) {
+        hub.every('Player 1 select from options', this.selectfromoptions);
+        hub.every('Player 2 select from options', this.selectfromoptions);
+        hub.every('Game quit', (function(_this) {
           return function() {
             return _this.rl.close();
           };
