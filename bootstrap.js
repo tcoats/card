@@ -9,11 +9,11 @@
   });
 
   requirejs(['infra/cson', 'infra/hub'], function(cson, hub) {
-    return cson('bootstrap.cson', function(bootstrap) {
+    return cson('config.cson', function(config) {
       var s;
       return requirejs((function() {
         var _i, _len, _ref, _results;
-        _ref = bootstrap.systems;
+        _ref = config.systems;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           s = _ref[_i];
@@ -22,7 +22,7 @@
         return _results;
       })(), function() {
         var e, _i, _len, _ref, _results;
-        _ref = bootstrap.events;
+        _ref = config.events;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           e = _ref[_i];
