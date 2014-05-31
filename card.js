@@ -43,7 +43,7 @@
   });
 
   define(['jquery', 'interact', 'screenfull', 'hammer', 'bootstrap', 'velocity', 'css!bootstrapcss', 'css!fontawesome', 'css!card'], function($, interact, screenfull, Hammer) {
-    var $board, Card;
+    var $board, Card, cards, delay;
     $.fn.velocity = function() {
       var options, propertiesMap, _velocity;
       _velocity = $.velocity || Zepto.velocity || window.velocity;
@@ -57,6 +57,8 @@
     };
     Card = (function() {
       function Card(container) {
+        this.animate = __bind(this.animate, this);
+        this.hide = __bind(this.hide, this);
         this._ondragend = __bind(this._ondragend, this);
         this._ondragmove = __bind(this._ondragmove, this);
         this._ondragstart = __bind(this._ondragstart, this);
@@ -64,13 +66,13 @@
         this.y = 0;
         this.elcc = $('<div />').addClass('card-c');
         this.elc = $('<div />').addClass('card').appendTo(this.elcc);
-        this.elc.append($('<h3 />').text('Ion Cannon'));
-        this.elc.append($('<p />').text('Ion Cannon is online, requesting firing coodinates'));
-        this.elc.append($('<span />').addClass('action').text('6'));
-        this.elc.append($('<span />').addClass('attack').text('10'));
-        this.elc.append($('<span />').addClass('armour').text('1'));
+        $('<h3>Ion Cannon</h3>').appendTo(this.elc);
+        $('<p>Ion Cannon is online, requesting firing coodinates</p>').appendTo(this.elc);
+        $('<span class="action">6</span>').appendTo(this.elc);
+        $('<span class="attack">10</span>').appendTo(this.elc);
+        $('<span class="armour">1</span>').appendTo(this.elc);
         container.append(this.elcc);
-        interact(this.elcc[0]).draggable({
+        interact(this.elc[0]).draggable({
           onstart: this._ondragstart,
           onmove: this._ondragmove,
           onend: this._ondragend
@@ -147,14 +149,44 @@
         });
       };
 
+      Card.prototype.hide = function() {
+        return this.elcc.hide();
+      };
+
+      Card.prototype.animate = function(done) {
+        return this.elcc.show().velocity({
+          properties: {
+            translateY: [this.y, 0],
+            translateX: [this.x, 'easeOutSine', 1000],
+            rotateZ: [0, 'easeOutSine', 90],
+            rotateY: [0, 'easeInSine', -90]
+          },
+          options: {
+            complete: done
+          }
+        });
+      };
+
       return Card;
 
     })();
     $board = $('#board');
-    new Card($board);
-    new Card($board);
-    new Card($board);
-    return new Card($board);
+    cards = [new Card($board), new Card($board), new Card($board), new Card($board)];
+    delay = function(func, time) {
+      return setTimeout(func, time);
+    };
+    return $board.find('button').on('click', function() {
+      var card, wait, _i, _len, _results;
+      wait = 0;
+      _results = [];
+      for (_i = 0, _len = cards.length; _i < _len; _i++) {
+        card = cards[_i];
+        card.hide();
+        delay(card.animate, wait);
+        _results.push(wait += 200);
+      }
+      return _results;
+    });
   });
 
 }).call(this);

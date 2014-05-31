@@ -58,15 +58,15 @@ define [
 			
 			@elcc = $('<div />').addClass('card-c')
 			@elc = $('<div />').addClass('card').appendTo @elcc
-			@elc.append $('<h3 />').text 'Ion Cannon'
-			@elc.append $('<p />').text 'Ion Cannon is online, requesting firing coodinates'
-			@elc.append $('<span />').addClass('action').text '6'
-			@elc.append $('<span />').addClass('attack').text '10'
-			@elc.append $('<span />').addClass('armour').text '1'
+			$('<h3>Ion Cannon</h3>').appendTo @elc
+			$('<p>Ion Cannon is online, requesting firing coodinates</p>').appendTo @elc
+			$('<span class="action">6</span>').appendTo @elc
+			$('<span class="attack">10</span>').appendTo @elc
+			$('<span class="armour">1</span>').appendTo @elc
 			
 			container.append @elcc
 			
-			interact(@elcc[0])
+			interact(@elc[0])
 				.draggable(
 					onstart: @_ondragstart
 					onmove: @_ondragmove
@@ -78,7 +78,7 @@ define [
 					translateZ: 0
 				options:
 					duration: 0
-						
+		
 		_ondragstart: (e) =>
 			@elcc.css('z-index', 1)
 			@elc
@@ -127,12 +127,38 @@ define [
 						duration: 100
 						complete: =>
 							@elcc.css('z-index', 0)
+		
+		hide: =>
+			@elcc.hide()
+		
+		animate: (done) =>
+			@elcc.show().velocity
+				properties:
+					translateY: [@y, 0]
+					translateX: [@x, 'easeOutSine', 1000]
+					rotateZ: [0, 'easeOutSine', 90]
+					rotateY: [0, 'easeInSine', -90]
+				options:
+					complete: done
 
 	$board = $ '#board'
-	new Card $board
-	new Card $board
-	new Card $board
-	new Card $board
+	cards = [
+		new Card $board
+		new Card $board
+		new Card $board
+		new Card $board
+	]
+	
+	delay = (func, time) ->
+		setTimeout func, time
+	
+	$board.find('button').on 'click', ->
+		wait = 0
+		for card in cards
+			card.hide()
+			delay card.animate, wait
+			wait += 200
+				
 	
 	## Bring this back one day
 	#$('.fa-arrows').on 'click', ->
