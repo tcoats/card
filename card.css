@@ -7,12 +7,8 @@ body,
   padding: 0;
 }
 #board {
-  -webkit-transform: translatez(-100);
-  -moz-transform: translatez(-100);
-  -ms-transform: translatez(-100);
-  -o-transform: translatez(-100);
-  transform: translatez(-100);
   background-color: black;
+  overflow: hidden;
 }
 .card-c {
   -webkit-perspective: 1000px;
@@ -28,6 +24,7 @@ body,
   width: 150px;
   height: 230px;
   padding: 10px;
+  position: absolute;
 }
 .card {
   width: 150px;
@@ -48,7 +45,7 @@ body,
   left: 0;
   right: 0;
   bottom: 0;
-  border: 5px solid #282828;
+  border: 7px solid #282828;
   border-radius: 9px;
 }
 .card h3 {
