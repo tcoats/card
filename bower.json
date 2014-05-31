@@ -1,0 +1,31 @@
+{
+  "name": "card",
+  "description": "Card game framework",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "jquery": "*",
+    "durandal": "*",
+    "knockout.js": "*",
+    "ko-validation": "*",
+    "requirejs": "*",
+    "requirejs-text": "*",
+    "require-css": "*",
+    "injectinto": "*",
+    "node-uuid": "*",
+    "q": "1.*",
+    "bootstrap": "*",
+    "font-awesome": "*",
+    "animate.css": "*",
+    "mousetrap": "*",
+    "d3": "~3.4.8",
+    "interact": "~1.0.15",
+    "screenfull": "~1.2.1",
+    "velocity": "~0.0.16"
+  },
+  "ignore": [
+    "node_modules/",
+    "config.json",
+    "bower_components"
+  ]
+}

@@ -1,0 +1,69 @@
+html, body, #board {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#board {
+	-webkit-transform: translatez(-100);
+	-moz-transform: translatez(-100);
+	-ms-transform: translatez(-100);
+	-o-transform: translatez(-100);
+	transform: translatez(-100);
+	background-color: black;
+}
+
+.card-c {
+	-webkit-perspective: 1000px;
+	-moz-perspective: 1000px;
+	perspective: 1000px;
+	perspective-origin: 50% 50%;
+	-webkit-transform: translatez(-100);
+	-moz-transform: translatez(-100);
+	-ms-transform: translatez(-100);
+	-o-transform: translatez(-100);
+	transform: translatez(-100);
+	cursor: move;
+	width: 150px;
+	height: 230px;
+	padding: 10px;
+}
+
+.card {
+	width: 150px;
+	height: 230px;
+	padding: 10px;
+
+	position: absolute;
+	border: 1px solid white;
+	border-radius: 10px;
+	
+	&:before {
+		content: " ";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border: 5px solid #282828;
+		border-radius: 9px;
+	}
+	
+	background-image: url('escheresque_ste.png');
+	background-size: 23px 14.5px;
+	
+	color: white;
+	text-align: center;
+	
+	h3 {
+		margin: 0px;
+		font-weight: normal;
+		-webkit-transform: translateZ(2000);
+		transform: translateZ(2000);
+	}
+	
+	p {
+		margin-top: 30px;
+	}
+}
