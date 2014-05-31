@@ -66,15 +66,18 @@
         this.elc = $('<div />').addClass('card').appendTo(this.elcc);
         this.elc.append($('<h3 />').text('Ion Cannon'));
         this.elc.append($('<p />').text('Ion Cannon is online, requesting firing coodinates'));
+        this.elc.append($('<span />').addClass('action').text('6'));
+        this.elc.append($('<span />').addClass('attack').text('10'));
+        this.elc.append($('<span />').addClass('armour').text('1'));
         container.append(this.elcc);
         interact(this.elcc[0]).draggable({
           onstart: this._ondragstart,
           onmove: this._ondragmove,
           onend: this._ondragend
-        }).inertia(true);
+        });
         this.elc.velocity({
           properties: {
-            translateZ: -100
+            translateZ: 0
           },
           options: {
             duration: 0
@@ -86,7 +89,7 @@
         this.elcc.css('z-index', 1);
         return this.elc.velocity('stop').velocity({
           properties: {
-            translateZ: 0
+            translateZ: 100
           },
           options: {
             duration: 100
@@ -98,12 +101,8 @@
         var dx, dy;
         this.x += e.dx;
         this.y += e.dy;
-        dx = e.dx * 1.5;
-        dx = Math.min(dx, 45);
-        dx = Math.max(dx, -45);
-        dy = e.dy * 1.5;
-        dy = Math.min(dy, 45);
-        dy = Math.max(dy, -45);
+        dx = Math.max(Math.min(e.dx * 1.5, 45), -45);
+        dy = Math.max(Math.min(e.dy * 1.5, 45), -45);
         this.elcc.velocity({
           properties: {
             translateX: this.x,
@@ -135,7 +134,7 @@
           }
         }).velocity({
           properties: {
-            translateZ: -100
+            translateZ: 0
           },
           options: {
             duration: 100,

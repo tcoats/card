@@ -5,6 +5,7 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 #board {
   background-color: black;
@@ -30,7 +31,7 @@ body,
   width: 150px;
   height: 230px;
   padding: 10px;
-  position: absolute;
+  position: relative;
   border: 1px solid white;
   border-radius: 10px;
   background-image: url('escheresque_ste.png');
@@ -49,11 +50,50 @@ body,
   border-radius: 9px;
 }
 .card h3 {
-  margin: 0px;
-  font-weight: normal;
+  font-size: 16px;
+  margin-top: 3px;
+  margin-bottom: 0px;
+  font-weight: bold;
   -webkit-transform: translateZ(2000);
   transform: translateZ(2000);
 }
 .card p {
   margin-top: 30px;
+  font-size: 11px;
+}
+.card .action {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 5px 7px;
+  font-size: 24px;
+  line-height: 24px;
+  color: #4A90E2;
+  font-weight: bold;
+  background-color: #282828;
+  border-radius: 9px;
+}
+.card .attack {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 5px 7px;
+  font-size: 24px;
+  line-height: 24px;
+  color: #F5A623;
+  font-weight: bold;
+  background-color: #282828;
+  border-radius: 9px;
+}
+.card .armour {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 5px 7px;
+  font-size: 24px;
+  line-height: 24px;
+  color: #C90005;
+  font-weight: bold;
+  background-color: #282828;
+  border-radius: 9px;
 }

@@ -60,6 +60,9 @@ define [
 			@elc = $('<div />').addClass('card').appendTo @elcc
 			@elc.append $('<h3 />').text 'Ion Cannon'
 			@elc.append $('<p />').text 'Ion Cannon is online, requesting firing coodinates'
+			@elc.append $('<span />').addClass('action').text '6'
+			@elc.append $('<span />').addClass('attack').text '10'
+			@elc.append $('<span />').addClass('armour').text '1'
 			
 			container.append @elcc
 			
@@ -69,11 +72,10 @@ define [
 					onmove: @_ondragmove
 					onend: @_ondragend
 				)
-				.inertia(yes)
 			
 			@elc.velocity
 				properties:
-					translateZ: -100
+					translateZ: 0
 				options:
 					duration: 0
 						
@@ -83,26 +85,23 @@ define [
 				.velocity('stop')
 				.velocity
 					properties:
-						translateZ: 0
+						translateZ: 100
 					options:
 						duration: 100
 		
 		_ondragmove: (e) =>
 			@x += e.dx
 			@y += e.dy
-			dx = e.dx * 1.5
-			dx = Math.min dx, 45
-			dx = Math.max dx, -45
-			dy = e.dy * 1.5
-			dy = Math.min dy, 45
-			dy = Math.max dy, -45
+			# Limit to 45 degrees
+			dx = Math.max(Math.min(e.dx * 1.5, 45), -45)
+			dy = Math.max(Math.min(e.dy * 1.5, 45), -45)
 			
 			@elcc.velocity
-					properties:
-						translateX: @x
-						translateY: @y
-					options:
-						duration: 0
+				properties:
+					translateX: @x
+					translateY: @y
+				options:
+					duration: 0
 			
 			@elc
 				.velocity('stop')
@@ -123,7 +122,7 @@ define [
 						duration: 100)
 				.velocity
 					properties:
-						translateZ: -100
+						translateZ: 0
 					options:
 						duration: 100
 						complete: =>
