@@ -39,6 +39,7 @@ button {
   position: relative;
   border: 1px solid white;
   border-radius: 10px;
+  transform-style: preserve-3d;
   background-image: url('escheresque_ste.png');
   background-size: 23px 14.5px;
   color: white;
@@ -75,7 +76,6 @@ button {
   line-height: 24px;
   color: #4A90E2;
   font-weight: bold;
-  background-color: #282828;
   border-radius: 9px;
 }
 .card .attack {
@@ -87,7 +87,6 @@ button {
   line-height: 24px;
   color: #F5A623;
   font-weight: bold;
-  background-color: #282828;
   border-radius: 9px;
 }
 .card .armour {
@@ -99,6 +98,5 @@ button {
   line-height: 24px;
   color: #C90005;
   font-weight: bold;
-  background-color: #282828;
   border-radius: 9px;
 }

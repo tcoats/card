@@ -106,6 +106,14 @@
             duration: 100
           }
         });
+        this.elc.find('> *').velocity({
+          properties: {
+            translateZ: 20
+          },
+          options: {
+            duration: 100
+          }
+        });
         this.lastTime = getTimestamp();
         this.dy = 0;
         return this.dx = 0;
@@ -148,7 +156,7 @@
       };
 
       Card.prototype._ondragend = function(e) {
-        return this.elc.velocity({
+        this.elc.velocity({
           properties: {
             rotateY: 0,
             rotateX: 0
@@ -167,6 +175,14 @@
                 return _this.elcc.css('z-index', 0);
               };
             })(this)
+          }
+        });
+        return this.elc.find('> *').velocity({
+          properties: {
+            translateZ: 0
+          },
+          options: {
+            duration: 100
           }
         });
       };

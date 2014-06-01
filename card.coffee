@@ -98,6 +98,14 @@ define [
 						translateZ: 100
 					options:
 						duration: 100
+			@elc
+				.find('> *')
+				.velocity
+					properties:
+						translateZ: 20
+					options:
+						duration: 100
+						
 			@lastTime = getTimestamp()
 			@dy = 0
 			@dx = 0
@@ -152,6 +160,13 @@ define [
 						duration: 100
 						complete: =>
 							@elcc.css('z-index', 0)
+			@elc
+				.find('> *')
+				.velocity
+					properties:
+						translateZ: 0
+					options:
+						duration: 100
 		
 		hide: =>
 			@elcc.hide()
