@@ -105,6 +105,7 @@ define [
 						translateZ: 20
 					options:
 						duration: 100
+			@elc.addClass 'dragging'
 						
 			@lastTime = getTimestamp()
 			@dy = 0
@@ -160,6 +161,7 @@ define [
 						duration: 100
 						complete: =>
 							@elcc.css('z-index', 0)
+							@elc.removeClass 'dragging'
 			@elc
 				.find('> *')
 				.velocity
@@ -167,6 +169,8 @@ define [
 						translateZ: 0
 					options:
 						duration: 100
+						
+			
 		
 		hide: =>
 			@elcc.hide()

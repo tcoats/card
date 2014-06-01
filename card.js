@@ -114,6 +114,7 @@
             duration: 100
           }
         });
+        this.elc.addClass('dragging');
         this.lastTime = getTimestamp();
         this.dy = 0;
         return this.dx = 0;
@@ -172,7 +173,8 @@
             duration: 100,
             complete: (function(_this) {
               return function() {
-                return _this.elcc.css('z-index', 0);
+                _this.elcc.css('z-index', 0);
+                return _this.elc.removeClass('dragging');
               };
             })(this)
           }

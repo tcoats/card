@@ -67,6 +67,9 @@ button {
   margin-top: 30px;
   font-size: 11px;
 }
+.card.dragging span {
+  background: transparent;
+}
 .card .action {
   position: absolute;
   top: 0;
@@ -76,6 +79,7 @@ button {
   line-height: 24px;
   color: #4A90E2;
   font-weight: bold;
+  background-color: #282828;
   border-radius: 9px;
 }
 .card .attack {
@@ -87,6 +91,7 @@ button {
   line-height: 24px;
   color: #F5A623;
   font-weight: bold;
+  background-color: #282828;
   border-radius: 9px;
 }
 .card .armour {
@@ -98,5 +103,6 @@ button {
   line-height: 24px;
   color: #C90005;
   font-weight: bold;
+  background-color: #282828;
   border-radius: 9px;
 }
