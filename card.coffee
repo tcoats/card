@@ -50,7 +50,17 @@ define [
 			_velocity.animate.call(this, propertiesMap, options)
 		else
 			_velocity.animate.apply(this, arguments)
-
+		
+	# timer
+	getTimestamp = if !window.performance?
+			-> new Date().getTime()
+		else if window.performance.now?
+			-> window.performance.now()
+		else if window.performance.webkitNow? 
+			-> window.performance.webkitNow()
+		else
+			-> new Date().getTime()
+	
 	class Card
 		constructor: (container) ->
 			@x = 0
@@ -88,13 +98,28 @@ define [
 						translateZ: 100
 					options:
 						duration: 100
+			@lastTime = getTimestamp()
+			@dy = 0
+			@dx = 0
 		
 		_ondragmove: (e) =>
+			current = getTimestamp()
+			delta = current - @lastTime
+			@lastTime = current
+			
 			@x += e.dx
 			@y += e.dy
-			# Limit to 45 degrees
-			dx = Math.max(Math.min(e.dx * 1.5, 45), -45)
-			dy = Math.max(Math.min(e.dy * 1.5, 45), -45)
+			@dx += e.dx * 2
+			@dy += e.dy * 2
+			
+			decay = Math.exp -delta * 0.05
+			@dx *= decay
+			@dy *= decay
+			# Max 45 degree turn
+			@dx = Math.max @dx, -45
+			@dx = Math.min @dx, 45
+			@dy = Math.max @dy, -45
+			@dy = Math.min @dy, 45
 			
 			@elcc.velocity
 				properties:
@@ -107,8 +132,8 @@ define [
 				.velocity('stop')
 				.velocity
 					properties:
-						rotateY: dx
-						rotateX: -dy
+						rotateY: @dx
+						rotateX: -@dy
 					options:
 						duration: 0
 		

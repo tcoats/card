@@ -43,7 +43,7 @@
   });
 
   define(['jquery', 'interact', 'screenfull', 'hammer', 'bootstrap', 'velocity', 'css!bootstrapcss', 'css!fontawesome', 'css!card'], function($, interact, screenfull, Hammer) {
-    var $board, Card, cards, delay;
+    var $board, Card, cards, delay, getTimestamp;
     $.fn.velocity = function() {
       var options, propertiesMap, _velocity;
       _velocity = $.velocity || Zepto.velocity || window.velocity;
@@ -54,6 +54,15 @@
       } else {
         return _velocity.animate.apply(this, arguments);
       }
+    };
+    getTimestamp = window.performance == null ? function() {
+      return new Date().getTime();
+    } : window.performance.now != null ? function() {
+      return window.performance.now();
+    } : window.performance.webkitNow != null ? function() {
+      return window.performance.webkitNow();
+    } : function() {
+      return new Date().getTime();
     };
     Card = (function() {
       function Card(container) {
@@ -89,7 +98,7 @@
 
       Card.prototype._ondragstart = function(e) {
         this.elcc.css('z-index', 1);
-        return this.elc.velocity('stop').velocity({
+        this.elc.velocity('stop').velocity({
           properties: {
             translateZ: 100
           },
@@ -97,14 +106,27 @@
             duration: 100
           }
         });
+        this.lastTime = getTimestamp();
+        this.dy = 0;
+        return this.dx = 0;
       };
 
       Card.prototype._ondragmove = function(e) {
-        var dx, dy;
+        var current, decay, delta;
+        current = getTimestamp();
+        delta = current - this.lastTime;
+        this.lastTime = current;
         this.x += e.dx;
         this.y += e.dy;
-        dx = Math.max(Math.min(e.dx * 1.5, 45), -45);
-        dy = Math.max(Math.min(e.dy * 1.5, 45), -45);
+        this.dx += e.dx * 2;
+        this.dy += e.dy * 2;
+        decay = Math.exp(-delta * 0.05);
+        this.dx *= decay;
+        this.dy *= decay;
+        this.dx = Math.max(this.dx, -45);
+        this.dx = Math.min(this.dx, 45);
+        this.dy = Math.max(this.dy, -45);
+        this.dy = Math.min(this.dy, 45);
         this.elcc.velocity({
           properties: {
             translateX: this.x,
@@ -116,8 +138,8 @@
         });
         return this.elc.velocity('stop').velocity({
           properties: {
-            rotateY: dx,
-            rotateX: -dy
+            rotateY: this.dx,
+            rotateX: -this.dy
           },
           options: {
             duration: 0
