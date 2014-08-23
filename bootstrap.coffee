@@ -1,8 +1,12 @@
-requirejs = require 'requirejs'
-requirejs.config nodeRequire: require
+module.exports = (contexts) ->
+	requirejs = require 'requirejs'
+	requirejs.config
+		nodeRequire: require
+		paths:
+			odo: "#{__dirname}/node_modules/odo"
+			local: "#{__dirname}/"
+	requirejs ['odo/bootstrap'], (b) -> b contexts
 
-requirejs ['infra/cson', 'infra/hub'], (cson, hub) ->
-	cson 'config.cson', (config) ->
-		requirejs ("#{s}/#{s}" for s in config.systems), ->
-			for e in config.events
-				hub.emit e.n, e.p
+args = process.argv.slice 2
+if args.length > 0
+	module.exports args

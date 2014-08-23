@@ -1,11 +1,13 @@
 {
-	"name": "card",
-	"description": "Card game framework",
-	"version": "0.0.1",
-	"private": true,
-	"dependencies": {
-		"requirejs": "*",
-		"node-uuid": "*",
-		"cson": "*"
-	}
+  "name": "card",
+  "description": "Card game framework",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "cson": "^1.6.1",
+    "injectinto": "^1.0.1",
+    "node-uuid": "*",
+    "odo": "*",
+    "requirejs": "^2.1.14"
+  }
 }

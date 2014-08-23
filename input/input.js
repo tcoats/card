@@ -2,9 +2,9 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['infra/hub', 'readline'], function(hub, readline) {
+  define(['odo/hub', 'readline'], function(hub, readline) {
     var Input;
-    Input = (function() {
+    return Input = (function() {
       function Input() {
         this.getselection = __bind(this.getselection, this);
         this.selectfromoptions = __bind(this.selectfromoptions, this);
@@ -12,19 +12,21 @@
           input: process.stdin,
           output: process.stdout
         });
-        hub.every('Randomly select starting player', function() {
-          return hub.emit('Player 2 will start');
+        hub.every('Randomly select starting player', function(m, cb) {
+          hub.emit('Player 2 will start');
+          return cb();
         });
         hub.every('Player 1 select from options', this.selectfromoptions);
         hub.every('Player 2 select from options', this.selectfromoptions);
         hub.every('Game quit', (function(_this) {
-          return function() {
-            return _this.rl.close();
+          return function(m, cb) {
+            _this.rl.close();
+            return cb();
           };
         })(this));
       }
 
-      Input.prototype.selectfromoptions = function(options) {
+      Input.prototype.selectfromoptions = function(options, callback) {
         var cb, index, option, selection;
         if (options.length === 0) {
           hub.emit('error', 'No options present');
@@ -42,7 +44,8 @@
         }
         return this.getselection(options.length, (function(_this) {
           return function(index) {
-            return selection[index]();
+            selection[index]();
+            return callback();
           };
         })(this));
       };
@@ -58,7 +61,6 @@
       return Input;
 
     })();
-    return new Input();
   });
 
 }).call(this);
