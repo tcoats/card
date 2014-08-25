@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "cson": "^1.6.1",
+    "csv": "^0.4.0",
     "injectinto": "^1.0.1",
     "node-uuid": "*",
     "odo": "*",

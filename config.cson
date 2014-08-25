@@ -1,6 +1,6 @@
 systems: [
-	'input/input'
-	'game/game'
+	#'input/input'
+	#'game/game'
 	'decks/decks'
 ]
 
@@ -8,7 +8,14 @@ odo: domain: 'card'
 
 run: [
 	# Scout Ship
-	{ '{type} type has been created': type: 'Scout Ship' }
+	{
+		'create {displayName} card type':
+			id: 'e4f4ea51-ef83-4633-b865-fc7241d2da51'
+			type: 'Scout Ship'
+			damage: 1
+			armour: 1
+			cost: 1
+	}
 	{ '{type} type does {damage} damage': type: 'Scout Ship', damage: 1 }
 	{ '{type} type has {armour} armour': type: 'Scout Ship', armour: 1 }
 	{ '{type} type costs {cost}': type: 'Scout Ship', cost: 1 }

@@ -1,7 +1,16 @@
-define ['odo/hub', 'odo/delay'], (hub, delay) ->
+define ['module', 'fs', 'csv', 'odo/hub', 'odo/delay'], (module, fs, csv, hub, delay) ->
 	class Decks
 		constructor: ->
 			@decks = {}
+			
+			path = module.uri.split '/'
+			path.pop()
+			path.push 'cards.csv'
+			path = path.join '/'
+			console.log path
+			fs.readFile path, encoding: 'utf-8', (err, cards) =>
+				csv.parse cards, columns: yes, (err, data) =>
+					console.log data
 			
 			hub.every '{deck} deck has been created', (p, cb) =>
 				@decks[p.deck] =
