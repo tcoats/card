@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>hub.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="async.html">
+                async.coffee
+              </a>
+            
+              
+              <a class="source" href="boid.html">
+                boid.coffee
+              </a>
+            
+              
+              <a class="source" href="colors.html">
+                colors.coffee
+              </a>
+            
+              
+              <a class="source" href="hub.html">
+                hub.coffee
+              </a>
+            
+              
+              <a class="source" href="init.html">
+                init.coffee
+              </a>
+            
+              
+              <a class="source" href="sequencer.html">
+                sequencer.coffee
+              </a>
+            
+              
+              <a class="source" href="template.html">
+                template.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>hub.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'template'</span>, <span class="hljs-string">'async'</span>, <span class="hljs-string">'sequencer'</span>], <span class="hljs-function"><span class="hljs-params">(template, async, Sequencer)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Simple publish and subscribe
+Publish is async</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Hub</span></span>
+		<span class="hljs-attribute">constructor</span>:<span class="hljs-function"> -&gt;</span>
+			<span class="hljs-property">@listeners</span> = {}
+			<span class="hljs-property">@sequencer</span> = <span class="hljs-keyword">new</span> Sequencer()
+		
+		<span class="hljs-attribute">_every</span>: <span class="hljs-function"><span class="hljs-params">(e, cb)</span> =&gt;</span>
+			<span class="hljs-property">@listeners</span>[e] = [] <span class="hljs-keyword">if</span> !<span class="hljs-property">@listeners</span>[e]?
+			<span class="hljs-property">@listeners</span>[e].push cb
+			
+			<span class="hljs-attribute">off</span>:<span class="hljs-function"> =&gt;</span>
+				index = <span class="hljs-property">@listeners</span>[e].indexOf(cb)
+				<span class="hljs-keyword">if</span> index <span class="hljs-keyword">isnt</span> -<span class="hljs-number">1</span>
+					<span class="hljs-property">@listeners</span>[e].splice index, <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Subscribe to an event</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-attribute">every</span>: <span class="hljs-function"><span class="hljs-params">(events, cb)</span> =&gt;</span>
+			events = [events] <span class="hljs-keyword">unless</span> events <span class="hljs-keyword">instanceof</span> Array
+			bindings = <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> events
+				<span class="hljs-attribute">event</span>: e
+			
+			<span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> bindings
+				e.binding = <span class="hljs-property">@_every</span> e.event, cb
+			
+			<span class="hljs-attribute">off</span>:<span class="hljs-function"> =&gt;</span> e.binding.<span class="hljs-literal">off</span>() <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> bindings
+		
+		<span class="hljs-attribute">_once</span>: <span class="hljs-function"><span class="hljs-params">(e, cb)</span> =&gt;</span>
+			binding = <span class="hljs-property">@every</span> e, <span class="hljs-function"><span class="hljs-params">(payload, callback)</span> =&gt;</span>
+				binding.<span class="hljs-literal">off</span>()
+				cb payload, callback
+			<span class="hljs-attribute">off</span>:<span class="hljs-function"> -&gt;</span> binding.<span class="hljs-literal">off</span>()
+		
+		<span class="hljs-attribute">once</span>: <span class="hljs-function"><span class="hljs-params">(events, cb)</span> =&gt;</span>
+			events = [events] <span class="hljs-keyword">unless</span> events <span class="hljs-keyword">instanceof</span> Array
+			
+			count = <span class="hljs-number">0</span>
+			bindings = <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> events
+				count++
+				<span class="hljs-attribute">event</span>: e
+				<span class="hljs-attribute">complete</span>: <span class="hljs-literal">no</span>
+			
+			<span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> bindings
+				e.binding = <span class="hljs-property">@_once</span> e.event, <span class="hljs-function"><span class="hljs-params">(m, callback)</span> -&gt;</span>
+					count--
+					e.complete = <span class="hljs-literal">yes</span>
+					<span class="hljs-keyword">if</span> count <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+						cb(m, callback)
+					<span class="hljs-keyword">else</span>
+						callback()
+			
+			<span class="hljs-attribute">off</span>:<span class="hljs-function"> -&gt;</span> e.binding.<span class="hljs-literal">off</span>() <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> bindings
+		
+		<span class="hljs-attribute">any</span>: <span class="hljs-function"><span class="hljs-params">(events, cb)</span> =&gt;</span>
+			bindings = <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> events
+				<span class="hljs-attribute">event</span>: e
+<span class="hljs-function">			
+			<span class="hljs-title">unbind</span> = -&gt;</span> e.binding.<span class="hljs-literal">off</span>() <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> bindings
+			
+			<span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> bindings
+				e.binding = <span class="hljs-property">@_once</span> e.event,<span class="hljs-function"> -&gt;</span>
+					unbind()
+					cb()
+			
+			<span class="hljs-attribute">off</span>: unbind</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Publish an event</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-attribute">emit</span>: <span class="hljs-function"><span class="hljs-params">(e, m, ecb)</span> =&gt;</span>
+			description = <span class="hljs-string">"<span class="hljs-subst">#{template e, m}</span>"</span>
+			<span class="hljs-built_in">console</span>.log <span class="hljs-string">"+ <span class="hljs-subst">#{description}</span>"</span>
+			
+			tasks = []
+			<span class="hljs-keyword">if</span> <span class="hljs-property">@listeners</span>[e]?
+				<span class="hljs-keyword">for</span> listener <span class="hljs-keyword">in</span> <span class="hljs-property">@listeners</span>[e].slice()
+					<span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(listener)</span> =&gt;</span>
+						tasks.push <span class="hljs-function"><span class="hljs-params">(pcb)</span> =&gt;</span>
+							<span class="hljs-property">@sequencer</span>.exec description, <span class="hljs-function"><span class="hljs-params">(scb)</span> -&gt;</span>
+								listener m,<span class="hljs-function"> -&gt;</span>
+									pcb()
+									scb()
+			
+			async.parallel tasks,<span class="hljs-function"> -&gt;</span> ecb() <span class="hljs-keyword">if</span> ecb?
+		
+		<span class="hljs-attribute">ready</span>: <span class="hljs-function"><span class="hljs-params">(cb)</span> =&gt;</span>
+			<span class="hljs-property">@sequencer</span>.ready cb
+	
+	<span class="hljs-keyword">new</span> Hub()</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
