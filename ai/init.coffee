@@ -1,5 +1,13 @@
 # # AI Testbed
 
+define 'plugins', [
+	'statistics'
+	'ai'
+	'physics'
+	'coordinates'
+	'display'
+]
+
 define 'game', ['inject', 'plugins'], (inject) ->
 	# Add an initial set of boids into the system
 	for _ in [0..50]
@@ -10,14 +18,6 @@ define 'game', ['inject', 'plugins'], (inject) ->
 		inject.one('register physics') e, p5.Vector.random2D()
 		inject.one('register coordinates') e, createVector random(width), random(height)
 		inject.one('register display') e, name
-
-define 'plugins', [
-	'statistics'
-	'ai'
-	'physics'
-	'coordinates'
-	'display'
-]
 
 window.setup = ->
 	createCanvas windowWidth, windowHeight

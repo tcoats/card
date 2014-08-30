@@ -5,6 +5,8 @@ define ['inject'], (inject) ->
 			
 			inject.bind 'step', @step
 			inject.bind 'register statistics', @register
+			inject.bind 'absolute statistic', @absolutestatistic
+			inject.bind 'relative statistic', @relativestatistic
 			
 		step: =>
 			#for entity in @entities
@@ -15,5 +17,16 @@ define ['inject'], (inject) ->
 				n: n
 				e: -> entity
 			@entities.push entity.stats
+		
+		absolutestatistic: (entity, values) =>
+			stats = entity.stats
+			for key, value of values
+				stats[key] = value
+		
+		relativestatistic: (entity, values) =>
+			stats = entity.stats
+			for key, value of values
+				stats[key] = 0 if !stats[key]?
+				stats[key] += value
 	
 	new Statistics

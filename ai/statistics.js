@@ -6,11 +6,15 @@
     var Statistics;
     Statistics = (function() {
       function Statistics() {
+        this.relativestatistic = __bind(this.relativestatistic, this);
+        this.absolutestatistic = __bind(this.absolutestatistic, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
         this.entities = [];
         inject.bind('step', this.step);
         inject.bind('register statistics', this.register);
+        inject.bind('absolute statistic', this.absolutestatistic);
+        inject.bind('relative statistic', this.relativestatistic);
       }
 
       Statistics.prototype.step = function() {};
@@ -23,6 +27,31 @@
           }
         };
         return this.entities.push(entity.stats);
+      };
+
+      Statistics.prototype.absolutestatistic = function(entity, values) {
+        var key, stats, value, _results;
+        stats = entity.stats;
+        _results = [];
+        for (key in values) {
+          value = values[key];
+          _results.push(stats[key] = value);
+        }
+        return _results;
+      };
+
+      Statistics.prototype.relativestatistic = function(entity, values) {
+        var key, stats, value, _results;
+        stats = entity.stats;
+        _results = [];
+        for (key in values) {
+          value = values[key];
+          if (stats[key] == null) {
+            stats[key] = 0;
+          }
+          _results.push(stats[key] += value);
+        }
+        return _results;
       };
 
       return Statistics;

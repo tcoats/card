@@ -29,10 +29,10 @@
         var color;
         fill(colors.bg);
         color = colors.blue;
-        if (e.ai.iscommunity) {
+        if (e.stats.iscommunity) {
           color = colors.gold;
         }
-        if (e.ai.timesincetouch < 10) {
+        if (e.stats.timesincetouch < 10) {
           color = colors.red;
         }
         stroke(color);

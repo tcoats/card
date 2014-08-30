@@ -14,9 +14,9 @@ define ['inject', 'colors'], (inject, colors) ->
 		boid: (e) =>
 			fill colors.bg
 			color = colors.blue
-			if e.ai.iscommunity
+			if e.stats.iscommunity
 				color = colors.gold
-			if e.ai.timesincetouch < 10
+			if e.stats.timesincetouch < 10
 				color = colors.red
 			stroke color
 			ellipse e.coord.p.x, e.coord.p.y, 16, 16

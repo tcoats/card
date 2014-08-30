@@ -26,12 +26,13 @@ define ['inject', 'hub'], (inject, hub) ->
 				diff.div diff.mag() * 2
 				averagerepulsion.add diff
 			
-			if !entity.timesincetouch?
-				entity.timesincetouch
-			if averagerepulsion.mag() is 0
-				entity.timesincetouch++
+			istouched = averagerepulsion.mag() isnt 0
+			inject.one('absolute statistic') entity.e(), istouched: istouched
+			if !istouched
+				inject.one('relative statistic') entity.e(), timesincetouch: 1
 				return
-			entity.timesincetouch = 0
+			inject.one('absolute statistic') entity.e(),
+				timesincetouch: 0
 			
 			force = inject.one('calculate steering') entity.e(), averagerepulsion
 			force.mult 4.5
@@ -56,11 +57,9 @@ define ['inject', 'hub'], (inject, hub) ->
 				averageposition.add boid.coord.p # Add location
 				count++
 			
-			if !entity.iscommunity?
-				entity.iscommunity = no
+			inject.one('absolute statistic') entity.e(),
+				iscommunity: count > 0
 			iscommunity = count > 0
-			if entity.iscommunity isnt iscommunity
-				entity.iscommunity = iscommunity
 			
 			return if averageposition.mag() is 0
 			averageposition.div count

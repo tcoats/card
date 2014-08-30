@@ -40,7 +40,7 @@
       };
 
       AI.prototype.separate = function(entity) {
-        var averagerepulsion, force;
+        var averagerepulsion, force, istouched;
         averagerepulsion = createVector(0, 0);
         inject.one('each by distance')(entity.e().coord.p, 25, (function(_this) {
           return function(d, boid) {
@@ -53,14 +53,19 @@
             return averagerepulsion.add(diff);
           };
         })(this));
-        if (entity.timesincetouch == null) {
-          entity.timesincetouch;
-        }
-        if (averagerepulsion.mag() === 0) {
-          entity.timesincetouch++;
+        istouched = averagerepulsion.mag() !== 0;
+        inject.one('absolute statistic')(entity.e(), {
+          istouched: istouched
+        });
+        if (!istouched) {
+          inject.one('relative statistic')(entity.e(), {
+            timesincetouch: 1
+          });
           return;
         }
-        entity.timesincetouch = 0;
+        inject.one('absolute statistic')(entity.e(), {
+          timesincetouch: 0
+        });
         force = inject.one('calculate steering')(entity.e(), averagerepulsion);
         force.mult(4.5);
         return inject.one('apply force')(entity.e(), force);
@@ -98,13 +103,10 @@
             return count++;
           };
         })(this));
-        if (entity.iscommunity == null) {
-          entity.iscommunity = false;
-        }
+        inject.one('absolute statistic')(entity.e(), {
+          iscommunity: count > 0
+        });
         iscommunity = count > 0;
-        if (entity.iscommunity !== iscommunity) {
-          entity.iscommunity = iscommunity;
-        }
         if (averageposition.mag() === 0) {
           return;
         }
