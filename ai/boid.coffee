@@ -5,80 +5,46 @@ define ['inject'], (inject) ->
 			inject.one('register coordinates') @, p
 			inject.one('register physics') @, v, a
 			inject.one('register display') @, n
-			
-			@maxspeed = 3
-			@maxsteeringforce = 0.05 # Maximum steering force
 
-		step: (boids) ->
+		step: =>
 			@separate()
 			@align()
 			@cohere()
 
-		separate: ->
-			steer = createVector 0, 0
-			count = 0
-			
+		separate: =>
+			averagerepulsion = createVector 0, 0
 			for boid in inject.one('select by distance') @c.p, 25
 				continue if boid is @
 				diff = p5.Vector.sub @c.p, boid.c.p
-				d = diff.mag()
-				diff.normalize()
-				diff.div d # Weight by distance
-				steer.add diff
-				count++
+				diff.div diff.mag() * 2
+				averagerepulsion.add diff
+			return if averagerepulsion.mag() is 0
 			
-			# Average -- divide by how many
-			steer.div count if count > 0
-			return if steer.mag() is 0
-			
-			# Steering = Desired - Velocity
-			steer.normalize()
-			steer.mult @maxspeed
-			steer.sub @p.v
-			steer.limit @maxsteeringforce
-			steer.mult 2.5
-			inject.one('apply force') @, steer
+			force = inject.one('calculate steering') @, averagerepulsion
+			force.mult 2.5
+			inject.one('apply force') @, force
 
-		align: ->
-			sum = createVector 0, 0
-			count = 0
-			
+		align: =>
+			averagedirection = createVector 0, 0
 			for boid in inject.one('select by distance') @c.p, 50
 				continue if boid is @
-				sum.add boid.p.v
-				count++
+				averagedirection.add boid.p.v
+			return if averagedirection.mag() is 0
 			
-			return createVector 0, 0 if count is 0
-			
-			sum.div count
-			sum.normalize()
-			sum.mult @maxspeed
-			steer = p5.Vector.sub sum, @p.v
-			steer.limit @maxsteeringforce
-			steer.mult 1.0
-			inject.one('apply force') @, steer
+			forece = inject.one('calculate steering') @, averagedirection
+			forece.mult 1.0
+			inject.one('apply force') @, forece
 
-		cohere: ->
-			sum = createVector 0, 0
+		cohere: =>
+			averageposition = createVector 0, 0
 			count = 0
-			
 			for boid in inject.one('select by distance') @c.p, 100
 				continue if boid is @
-				sum.add boid.c.p # Add location
+				averageposition.add boid.c.p # Add location
 				count++
-					
-			return createVector 0, 0 if count is 0
-			
-			sum.div count
-			@seek sum
-
-		seek: (target) ->
-			# position to target
-			desired = p5.Vector.sub target, @c.p
-			desired.normalize()
-			desired.mult @maxspeed
-			# Steering = Desired minus Velocity
-			steer = p5.Vector.sub desired, @p.v
-			steer.limit @maxsteeringforce
-			steer.mult 1.0
-			inject.one('apply force') @, steer
+			return if averageposition.mag() is 0
+			averageposition.div count
+			direction = p5.Vector.sub averageposition, @c.p
+			force = inject.one('calculate steering') @, direction
+			force.mult 1.0
+			inject.one('apply force') @, force

@@ -6,15 +6,19 @@
     var Physics;
     Physics = (function() {
       function Physics() {
+        this.calculatesteering = __bind(this.calculatesteering, this);
         this.seek = __bind(this.seek, this);
         this.apply = __bind(this.apply, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
+        this.maxspeed = 3;
+        this.maxsteeringforce = 0.05;
         this.entities = [];
         inject.bind('step', this.step);
         inject.bind('register physics', this.register);
         inject.bind('apply force', this.apply);
         inject.bind('seek target', this.seek);
+        inject.bind('calculate steering', this.calculatesteering);
       }
 
       Physics.prototype.step = function() {
@@ -25,7 +29,7 @@
           entity = _ref[_i];
           entity.v.add(entity.a);
           entity.a.mult(0);
-          entity.a.limit(3);
+          entity.a.limit(this.maxspeed);
           _results.push(inject.one('delta position')(entity.e(), entity.v));
         }
         return _results;
@@ -47,6 +51,16 @@
       };
 
       Physics.prototype.seek = function(entity, target) {};
+
+      Physics.prototype.calculatesteering = function(entity, steer) {
+        var result;
+        result = steer.get();
+        result.normalize();
+        result.mult(this.maxspeed);
+        result.sub(entity.p.v);
+        result.limit(this.maxsteeringforce);
+        return result;
+      };
 
       return Physics;
 
