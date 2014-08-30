@@ -35,10 +35,10 @@
         return _results;
       };
 
-      Physics.prototype.register = function(entity, v, a) {
+      Physics.prototype.register = function(entity, v) {
         entity.p = {
           v: v,
-          a: a,
+          a: createVector(0, 0),
           e: function() {
             return entity;
           }

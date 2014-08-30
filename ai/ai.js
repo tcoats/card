@@ -10,11 +10,24 @@
         var _, _i, _j;
         this.boids = [];
         for (_ = _i = 0; _i <= 90; _ = ++_i) {
-          this.boids.push(new Boid(createVector(random(width), random(height)), p5.Vector.random2D(), createVector(0, 0), 'boid'));
+          this.boids.push(new Boid({
+            position: createVector(random(width), random(height)),
+            velocity: p5.Vector.random2D(),
+            name: 'boid'
+          }));
         }
         for (_ = _j = 0; _j <= 10; _ = ++_j) {
-          this.boids.push(new Boid(createVector(random(width), random(height)), p5.Vector.random2D(), createVector(0, 0), 'boid2'));
+          this.boids.push(new Boid({
+            position: createVector(random(width), random(height)),
+            velocity: p5.Vector.random2D(),
+            name: 'boid2'
+          }));
         }
+        this.boids.push(new Boid({
+          position: createVector(random(width), random(height)),
+          velocity: p5.Vector.random2D(),
+          name: 'boid3'
+        }));
         inject.bind('step', this.step);
       }
 

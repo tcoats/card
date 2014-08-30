@@ -18,8 +18,8 @@ define ['inject'], (inject) ->
 				entity.a.limit @maxspeed
 				inject.one('delta position') entity.e(), entity.v
 		
-		register: (entity, v, a) =>
-			entity.p = v: v, a: a, e: -> entity
+		register: (entity, v) =>
+			entity.p = v: v, a: createVector(0, 0), e: -> entity
 			@entities.push entity.p
 		
 		apply: (entity, f) =>

@@ -6,7 +6,7 @@ define ['inject'], (inject) ->
 			inject.bind 'step', @step
 			inject.bind 'register coordinates', @register
 			inject.bind 'delta position', @delta
-			inject.bind 'select by distance', @distanceselect
+			inject.bind 'each by distance', @eachbydistance
 		
 		# Clip
 		step: =>
@@ -23,10 +23,10 @@ define ['inject'], (inject) ->
 		delta: (entity, d) =>
 			entity.c.p.add d
 		
-		distanceselect: (p, r) =>
-			@entities
-				.filter (e) -> p5.Vector.dist(p, e.p) < r
-				.map (e) -> e.e()
-				
+		eachbydistance: (p, r, cb) =>
+			for entity in @entities
+				distance = p5.Vector.dist p, entity.p
+				continue if distance > r
+				cb distance, entity.e()
 		
 	new Coordinates()

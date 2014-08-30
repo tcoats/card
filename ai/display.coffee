@@ -21,6 +21,11 @@ define ['inject', 'colors'], (inject, colors) ->
 			stroke colors.gold
 			ellipse e.c.p.x, e.c.p.y, 16, 16
 		
+		boid3: (e) =>
+			fill colors.bg
+			stroke colors.red
+			ellipse e.c.p.x, e.c.p.y, 16, 16
+		
 		register: (entity, name) =>
 			entity.d = n: name, e: -> entity
 			@entities.push entity.d

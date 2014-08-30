@@ -7,6 +7,7 @@
     Display = (function() {
       function Display() {
         this.register = __bind(this.register, this);
+        this.boid3 = __bind(this.boid3, this);
         this.boid2 = __bind(this.boid2, this);
         this.boid = __bind(this.boid, this);
         this.step = __bind(this.step, this);
@@ -35,6 +36,12 @@
       Display.prototype.boid2 = function(e) {
         fill(colors.bg);
         stroke(colors.gold);
+        return ellipse(e.c.p.x, e.c.p.y, 16, 16);
+      };
+
+      Display.prototype.boid3 = function(e) {
+        fill(colors.bg);
+        stroke(colors.red);
         return ellipse(e.c.p.x, e.c.p.y, 16, 16);
       };
 

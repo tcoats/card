@@ -6,7 +6,7 @@
     var Coordinates;
     Coordinates = (function() {
       function Coordinates() {
-        this.distanceselect = __bind(this.distanceselect, this);
+        this.eachbydistance = __bind(this.eachbydistance, this);
         this.delta = __bind(this.delta, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
@@ -14,7 +14,7 @@
         inject.bind('step', this.step);
         inject.bind('register coordinates', this.register);
         inject.bind('delta position', this.delta);
-        inject.bind('select by distance', this.distanceselect);
+        inject.bind('each by distance', this.eachbydistance);
       }
 
       Coordinates.prototype.step = function() {
@@ -55,12 +55,19 @@
         return entity.c.p.add(d);
       };
 
-      Coordinates.prototype.distanceselect = function(p, r) {
-        return this.entities.filter(function(e) {
-          return p5.Vector.dist(p, e.p) < r;
-        }).map(function(e) {
-          return e.e();
-        });
+      Coordinates.prototype.eachbydistance = function(p, r, cb) {
+        var distance, entity, _i, _len, _ref, _results;
+        _ref = this.entities;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          entity = _ref[_i];
+          distance = p5.Vector.dist(p, entity.p);
+          if (distance > r) {
+            continue;
+          }
+          _results.push(cb(distance, entity.e()));
+        }
+        return _results;
       };
 
       return Coordinates;

@@ -5,14 +5,14 @@
   define(['inject'], function(inject) {
     var Boid;
     return Boid = (function() {
-      function Boid(p, v, a, n) {
+      function Boid(options) {
         this.cohere = __bind(this.cohere, this);
         this.align = __bind(this.align, this);
         this.separate = __bind(this.separate, this);
         this.step = __bind(this.step, this);
-        inject.one('register coordinates')(this, p);
-        inject.one('register physics')(this, v, a);
-        inject.one('register display')(this, n);
+        inject.one('register coordinates')(this, options.position);
+        inject.one('register physics')(this, options.velocity);
+        inject.one('register display')(this, options.name);
       }
 
       Boid.prototype.step = function() {
@@ -22,37 +22,38 @@
       };
 
       Boid.prototype.separate = function() {
-        var averagerepulsion, boid, diff, force, _i, _len, _ref;
+        var averagerepulsion, force;
         averagerepulsion = createVector(0, 0);
-        _ref = inject.one('select by distance')(this.c.p, 25);
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          boid = _ref[_i];
-          if (boid === this) {
-            continue;
-          }
-          diff = p5.Vector.sub(this.c.p, boid.c.p);
-          diff.div(diff.mag() * 2);
-          averagerepulsion.add(diff);
-        }
+        inject.one('each by distance')(this.c.p, 25, (function(_this) {
+          return function(d, boid) {
+            var diff;
+            if (boid === _this) {
+              return;
+            }
+            diff = p5.Vector.sub(_this.c.p, boid.c.p);
+            diff.div(diff.mag() * 2);
+            return averagerepulsion.add(diff);
+          };
+        })(this));
         if (averagerepulsion.mag() === 0) {
           return;
         }
         force = inject.one('calculate steering')(this, averagerepulsion);
-        force.mult(2.5);
+        force.mult(4.5);
         return inject.one('apply force')(this, force);
       };
 
       Boid.prototype.align = function() {
-        var averagedirection, boid, forece, _i, _len, _ref;
+        var averagedirection, forece;
         averagedirection = createVector(0, 0);
-        _ref = inject.one('select by distance')(this.c.p, 50);
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          boid = _ref[_i];
-          if (boid === this) {
-            continue;
-          }
-          averagedirection.add(boid.p.v);
-        }
+        inject.one('each by distance')(this.c.p, 50, (function(_this) {
+          return function(d, boid) {
+            if (boid === _this) {
+              return;
+            }
+            return averagedirection.add(boid.p.v);
+          };
+        })(this));
         if (averagedirection.mag() === 0) {
           return;
         }
@@ -62,18 +63,18 @@
       };
 
       Boid.prototype.cohere = function() {
-        var averageposition, boid, count, direction, force, _i, _len, _ref;
+        var averageposition, count, direction, force;
         averageposition = createVector(0, 0);
         count = 0;
-        _ref = inject.one('select by distance')(this.c.p, 100);
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          boid = _ref[_i];
-          if (boid === this) {
-            continue;
-          }
-          averageposition.add(boid.c.p);
-          count++;
-        }
+        inject.one('each by distance')(this.c.p, 100, (function(_this) {
+          return function(d, boid) {
+            if (boid === _this) {
+              return;
+            }
+            averageposition.add(boid.c.p);
+            return count++;
+          };
+        })(this));
         if (averageposition.mag() === 0) {
           return;
         }
