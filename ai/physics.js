@@ -7,7 +7,6 @@
     Physics = (function() {
       function Physics() {
         this.calculatesteering = __bind(this.calculatesteering, this);
-        this.seek = __bind(this.seek, this);
         this.apply = __bind(this.apply, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
@@ -17,7 +16,6 @@
         inject.bind('step', this.step);
         inject.bind('register physics', this.register);
         inject.bind('apply force', this.apply);
-        inject.bind('seek target', this.seek);
         inject.bind('calculate steering', this.calculatesteering);
       }
 
@@ -49,8 +47,6 @@
       Physics.prototype.apply = function(entity, f) {
         return entity.p.a.add(f);
       };
-
-      Physics.prototype.seek = function(entity, target) {};
 
       Physics.prototype.calculatesteering = function(entity, steer) {
         var result;

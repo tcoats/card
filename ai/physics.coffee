@@ -7,7 +7,6 @@ define ['inject'], (inject) ->
 			inject.bind 'step', @step
 			inject.bind 'register physics', @register
 			inject.bind 'apply force', @apply
-			inject.bind 'seek target', @seek
 			inject.bind 'calculate steering', @calculatesteering
 		
 		# Integrate
@@ -24,10 +23,7 @@ define ['inject'], (inject) ->
 		
 		apply: (entity, f) =>
 			entity.p.a.add f
-		
-		seek: (entity, target) =>
-		
-		
+
 		calculatesteering: (entity, steer) =>
 			result = steer.get()
 			result.normalize()
@@ -36,5 +32,4 @@ define ['inject'], (inject) ->
 			result.limit @maxsteeringforce
 			result
 			
-		
 	new Physics()
