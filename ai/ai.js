@@ -2,44 +2,110 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['inject', 'boid'], function(inject, Boid) {
+  define(['inject'], function(inject) {
     var AI;
     AI = (function() {
       function AI() {
+        this.cohere = __bind(this.cohere, this);
+        this.align = __bind(this.align, this);
+        this.separate = __bind(this.separate, this);
+        this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
-        var _, _i, _j;
-        this.boids = [];
-        for (_ = _i = 0; _i <= 90; _ = ++_i) {
-          this.boids.push(new Boid({
-            position: createVector(random(width), random(height)),
-            velocity: p5.Vector.random2D(),
-            name: 'boid'
-          }));
-        }
-        for (_ = _j = 0; _j <= 10; _ = ++_j) {
-          this.boids.push(new Boid({
-            position: createVector(random(width), random(height)),
-            velocity: p5.Vector.random2D(),
-            name: 'boid2'
-          }));
-        }
-        this.boids.push(new Boid({
-          position: createVector(random(width), random(height)),
-          velocity: p5.Vector.random2D(),
-          name: 'boid3'
-        }));
+        this.entities = [];
         inject.bind('step', this.step);
+        inject.bind('register ai', this.register);
       }
 
       AI.prototype.step = function() {
-        var boid, _i, _len, _ref, _results;
-        _ref = this.boids;
+        var entity, _i, _len, _ref, _results;
+        _ref = this.entities;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          boid = _ref[_i];
-          _results.push(boid.step(this.boids));
+          entity = _ref[_i];
+          this.separate(entity);
+          this.align(entity);
+          _results.push(this.cohere(entity));
         }
         return _results;
+      };
+
+      AI.prototype.register = function(entity, n) {
+        entity.ai = {
+          n: n,
+          isrepulsed: false,
+          e: function() {
+            return entity;
+          }
+        };
+        return this.entities.push(entity.ai);
+      };
+
+      AI.prototype.separate = function(entity) {
+        var averagerepulsion, force, isrepulsed;
+        averagerepulsion = createVector(0, 0);
+        inject.one('each by distance')(entity.e().c.p, 25, (function(_this) {
+          return function(d, boid) {
+            var diff;
+            if (boid === entity.e()) {
+              return;
+            }
+            diff = p5.Vector.sub(entity.e().c.p, boid.c.p);
+            diff.div(diff.mag() * 2);
+            return averagerepulsion.add(diff);
+          };
+        })(this));
+        isrepulsed = averagerepulsion.mag() !== 0;
+        if (entity.isrepulsed !== isrepulsed) {
+          entity.isrepulsed = isrepulsed;
+        }
+        if (!isrepulsed) {
+          return;
+        }
+        force = inject.one('calculate steering')(entity.e(), averagerepulsion);
+        force.mult(4.5);
+        return inject.one('apply force')(entity.e(), force);
+      };
+
+      AI.prototype.align = function(entity) {
+        var averagedirection, forece;
+        averagedirection = createVector(0, 0);
+        inject.one('each by distance')(entity.e().c.p, 50, (function(_this) {
+          return function(d, boid) {
+            if (boid === entity.e()) {
+              return;
+            }
+            return averagedirection.add(boid.p.v);
+          };
+        })(this));
+        if (averagedirection.mag() === 0) {
+          return;
+        }
+        forece = inject.one('calculate steering')(entity.e(), averagedirection);
+        forece.mult(1.0);
+        return inject.one('apply force')(entity.e(), forece);
+      };
+
+      AI.prototype.cohere = function(entity) {
+        var averageposition, count, direction, force;
+        averageposition = createVector(0, 0);
+        count = 0;
+        inject.one('each by distance')(entity.e().c.p, 100, (function(_this) {
+          return function(d, boid) {
+            if (boid === entity.e()) {
+              return;
+            }
+            averageposition.add(boid.c.p);
+            return count++;
+          };
+        })(this));
+        if (averageposition.mag() === 0) {
+          return;
+        }
+        averageposition.div(count);
+        direction = p5.Vector.sub(averageposition, entity.e().c.p);
+        force = inject.one('calculate steering')(entity.e(), direction);
+        force.mult(1.0);
+        return inject.one('apply force')(entity.e(), force);
       };
 
       return AI;
