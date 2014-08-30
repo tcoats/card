@@ -14,7 +14,7 @@ define 'game', ['inject', 'plugins'], (inject) ->
 		e = {}
 		name = 'boid'
 		inject.one('register ai') e, name
-		inject.one('register statistics') e, name
+		inject.one('register statistics') e
 		inject.one('register physics') e, p5.Vector.random2D()
 		inject.one('register coordinates') e, createVector random(width), random(height)
 		inject.one('register display') e, name
@@ -23,5 +23,6 @@ window.setup = ->
 	createCanvas windowWidth, windowHeight
 	requirejs.config urlArgs: 'v=' + (new Date()).getTime() # cache busting
 	requirejs ['inject', 'game'], (inject) ->
+		setup() for setup in inject.many 'setup'
 		window.draw = ->
-			exec() for exec in inject.many 'step'
+			step() for step in inject.many 'step'

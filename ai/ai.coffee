@@ -3,9 +3,19 @@ define ['inject', 'hub'], (inject, hub) ->
 		constructor: ->
 			@entities = []
 			
+			inject.bind 'setup', @setup
 			inject.bind 'step', @step
 			inject.bind 'register ai', @register
-			
+		
+		setup: =>
+			inject.one('register derived statistic') 'istouched',
+				(entity, _, istouched) =>
+					if istouched
+						inject.one('absolute statistic') entity,
+							timesincetouch: 0
+					else
+						inject.one('relative statistic') entity, timesincetouch: 1
+		
 		step: =>
 			for entity in @entities
 				@separate entity
@@ -20,19 +30,15 @@ define ['inject', 'hub'], (inject, hub) ->
 		
 		separate: (entity) =>
 			averagerepulsion = createVector 0, 0
-			inject.one('each by distance') entity.e().coord.p, 25, (d, boid) =>
-				return if boid is entity.e() or !boid.ai?
-				diff = p5.Vector.sub entity.e().coord.p, boid.coord.p
+			inject.one('each by distance') entity.e().coord.p, 25, (d, e) =>
+				return if e is entity.e() or !e.ai?
+				diff = p5.Vector.sub entity.e().coord.p, e.coord.p
 				diff.div diff.mag() * 2
 				averagerepulsion.add diff
 			
 			istouched = averagerepulsion.mag() isnt 0
 			inject.one('absolute statistic') entity.e(), istouched: istouched
-			if !istouched
-				inject.one('relative statistic') entity.e(), timesincetouch: 1
-				return
-			inject.one('absolute statistic') entity.e(),
-				timesincetouch: 0
+			return if !istouched
 			
 			force = inject.one('calculate steering') entity.e(), averagerepulsion
 			force.mult 4.5
@@ -40,9 +46,9 @@ define ['inject', 'hub'], (inject, hub) ->
 
 		align: (entity) =>
 			averagedirection = createVector 0, 0
-			inject.one('each by distance') entity.e().coord.p, 50, (d, boid) =>
-				return if boid is entity.e() or !boid.ai?
-				averagedirection.add boid.phys.v
+			inject.one('each by distance') entity.e().coord.p, 50, (d, e) =>
+				return if e is entity.e() or !e.ai?
+				averagedirection.add e.phys.v
 			return if averagedirection.mag() is 0
 			
 			forece = inject.one('calculate steering') entity.e(), averagedirection
@@ -52,9 +58,9 @@ define ['inject', 'hub'], (inject, hub) ->
 		cohere: (entity) =>
 			averageposition = createVector 0, 0
 			count = 0
-			inject.one('each by distance') entity.e().coord.p, 100, (d, boid) =>
-				return if boid is entity.e() or !boid.ai?
-				averageposition.add boid.coord.p # Add location
+			inject.one('each by distance') entity.e().coord.p, 100, (d, e) =>
+				return if e is entity.e() or !e.ai?
+				averageposition.add e.coord.p # Add location
 				count++
 			
 			inject.one('absolute statistic') entity.e(),

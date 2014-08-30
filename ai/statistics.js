@@ -6,22 +6,24 @@
     var Statistics;
     Statistics = (function() {
       function Statistics() {
+        this.derivedstatstic = __bind(this.derivedstatstic, this);
         this.relativestatistic = __bind(this.relativestatistic, this);
         this.absolutestatistic = __bind(this.absolutestatistic, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
         this.entities = [];
+        this.derived = {};
         inject.bind('step', this.step);
         inject.bind('register statistics', this.register);
         inject.bind('absolute statistic', this.absolutestatistic);
         inject.bind('relative statistic', this.relativestatistic);
+        inject.bind('register derived statistic', this.derivedstatstic);
       }
 
       Statistics.prototype.step = function() {};
 
-      Statistics.prototype.register = function(entity, n) {
+      Statistics.prototype.register = function(entity) {
         entity.stats = {
-          n: n,
           e: function() {
             return entity;
           }
@@ -30,11 +32,19 @@
       };
 
       Statistics.prototype.absolutestatistic = function(entity, values) {
-        var key, stats, value, _results;
+        var current, derived, key, stats, value, _i, _len, _ref, _results;
         stats = entity.stats;
         _results = [];
         for (key in values) {
           value = values[key];
+          if (this.derived[key] != null) {
+            current = stats[key];
+            _ref = this.derived[key];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              derived = _ref[_i];
+              derived(entity, current, value);
+            }
+          }
           _results.push(stats[key] = value);
         }
         return _results;
@@ -52,6 +62,24 @@
           _results.push(stats[key] += value);
         }
         return _results;
+      };
+
+      Statistics.prototype.derivedstatstic = function(key, cb) {
+        if (this.derived[key] == null) {
+          this.derived[key] = [];
+        }
+        this.derived[key].push(cb);
+        return {
+          off: (function(_this) {
+            return function() {
+              var index;
+              index = _this.derived[key].indexOf(cb);
+              if (index !== -1) {
+                return _this.derived[key].splice(index, 1);
+              }
+            };
+          })(this)
+        };
       };
 
       return Statistics;

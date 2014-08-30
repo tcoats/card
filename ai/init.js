@@ -9,7 +9,7 @@
       e = {};
       name = 'boid';
       inject.one('register ai')(e, name);
-      inject.one('register statistics')(e, name);
+      inject.one('register statistics')(e);
       inject.one('register physics')(e, p5.Vector.random2D());
       inject.one('register coordinates')(e, createVector(random(width), random(height)));
       _results.push(inject.one('register display')(e, name));
@@ -23,13 +23,19 @@
       urlArgs: 'v=' + (new Date()).getTime()
     });
     return requirejs(['inject', 'game'], function(inject) {
+      var setup, _i, _len, _ref;
+      _ref = inject.many('setup');
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        setup = _ref[_i];
+        setup();
+      }
       return window.draw = function() {
-        var exec, _i, _len, _ref, _results;
-        _ref = inject.many('step');
+        var step, _j, _len1, _ref1, _results;
+        _ref1 = inject.many('step');
         _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          exec = _ref[_i];
-          _results.push(exec());
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          step = _ref1[_j];
+          _results.push(step());
         }
         return _results;
       };

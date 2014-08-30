@@ -11,10 +11,28 @@
         this.separate = __bind(this.separate, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
+        this.setup = __bind(this.setup, this);
         this.entities = [];
+        inject.bind('setup', this.setup);
         inject.bind('step', this.step);
         inject.bind('register ai', this.register);
       }
+
+      AI.prototype.setup = function() {
+        return inject.one('register derived statistic')('istouched', (function(_this) {
+          return function(entity, _, istouched) {
+            if (istouched) {
+              return inject.one('absolute statistic')(entity, {
+                timesincetouch: 0
+              });
+            } else {
+              return inject.one('relative statistic')(entity, {
+                timesincetouch: 1
+              });
+            }
+          };
+        })(this));
+      };
 
       AI.prototype.step = function() {
         var entity, _i, _len, _ref, _results;
@@ -43,12 +61,12 @@
         var averagerepulsion, force, istouched;
         averagerepulsion = createVector(0, 0);
         inject.one('each by distance')(entity.e().coord.p, 25, (function(_this) {
-          return function(d, boid) {
+          return function(d, e) {
             var diff;
-            if (boid === entity.e() || (boid.ai == null)) {
+            if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            diff = p5.Vector.sub(entity.e().coord.p, boid.coord.p);
+            diff = p5.Vector.sub(entity.e().coord.p, e.coord.p);
             diff.div(diff.mag() * 2);
             return averagerepulsion.add(diff);
           };
@@ -58,14 +76,8 @@
           istouched: istouched
         });
         if (!istouched) {
-          inject.one('relative statistic')(entity.e(), {
-            timesincetouch: 1
-          });
           return;
         }
-        inject.one('absolute statistic')(entity.e(), {
-          timesincetouch: 0
-        });
         force = inject.one('calculate steering')(entity.e(), averagerepulsion);
         force.mult(4.5);
         return inject.one('apply force')(entity.e(), force);
@@ -75,11 +87,11 @@
         var averagedirection, forece;
         averagedirection = createVector(0, 0);
         inject.one('each by distance')(entity.e().coord.p, 50, (function(_this) {
-          return function(d, boid) {
-            if (boid === entity.e() || (boid.ai == null)) {
+          return function(d, e) {
+            if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            return averagedirection.add(boid.phys.v);
+            return averagedirection.add(e.phys.v);
           };
         })(this));
         if (averagedirection.mag() === 0) {
@@ -95,11 +107,11 @@
         averageposition = createVector(0, 0);
         count = 0;
         inject.one('each by distance')(entity.e().coord.p, 100, (function(_this) {
-          return function(d, boid) {
-            if (boid === entity.e() || (boid.ai == null)) {
+          return function(d, e) {
+            if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            averageposition.add(boid.coord.p);
+            averageposition.add(e.coord.p);
             return count++;
           };
         })(this));
