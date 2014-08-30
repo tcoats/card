@@ -6,7 +6,7 @@
     var Statistics;
     Statistics = (function() {
       function Statistics() {
-        this.derivedstatstic = __bind(this.derivedstatstic, this);
+        this.statisticnotification = __bind(this.statisticnotification, this);
         this.relativestatistic = __bind(this.relativestatistic, this);
         this.absolutestatistic = __bind(this.absolutestatistic, this);
         this.register = __bind(this.register, this);
@@ -15,9 +15,9 @@
         this.derived = {};
         inject.bind('step', this.step);
         inject.bind('register statistics', this.register);
-        inject.bind('absolute statistic', this.absolutestatistic);
-        inject.bind('relative statistic', this.relativestatistic);
-        inject.bind('register derived statistic', this.derivedstatstic);
+        inject.bind('abs stat', this.absolutestatistic);
+        inject.bind('rel stat', this.relativestatistic);
+        inject.bind('stat notify', this.statisticnotification);
       }
 
       Statistics.prototype.step = function() {};
@@ -37,6 +37,9 @@
         _results = [];
         for (key in values) {
           value = values[key];
+          if (stats[key] == null) {
+            stats[key] = 0;
+          }
           if (this.derived[key] != null) {
             current = stats[key];
             _ref = this.derived[key];
@@ -51,7 +54,7 @@
       };
 
       Statistics.prototype.relativestatistic = function(entity, values) {
-        var key, stats, value, _results;
+        var key, p, stats, value, _results;
         stats = entity.stats;
         _results = [];
         for (key in values) {
@@ -59,12 +62,14 @@
           if (stats[key] == null) {
             stats[key] = 0;
           }
-          _results.push(stats[key] += value);
+          p = {};
+          p[key] = stats[key] + value;
+          _results.push(this.absolutestatistic(entity, p));
         }
         return _results;
       };
 
-      Statistics.prototype.derivedstatstic = function(key, cb) {
+      Statistics.prototype.statisticnotification = function(key, cb) {
         if (this.derived[key] == null) {
           this.derived[key] = [];
         }

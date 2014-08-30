@@ -19,14 +19,14 @@
       }
 
       AI.prototype.setup = function() {
-        return inject.one('register derived statistic')('istouched', (function(_this) {
+        return inject.one('stat notify')('istouched', (function(_this) {
           return function(entity, _, istouched) {
             if (istouched) {
-              return inject.one('absolute statistic')(entity, {
+              return inject.one('abs stat')(entity, {
                 timesincetouch: 0
               });
             } else {
-              return inject.one('relative statistic')(entity, {
+              return inject.one('rel stat')(entity, {
                 timesincetouch: 1
               });
             }
@@ -72,7 +72,7 @@
           };
         })(this));
         istouched = averagerepulsion.mag() !== 0;
-        inject.one('absolute statistic')(entity.e(), {
+        inject.one('abs stat')(entity.e(), {
           istouched: istouched
         });
         if (!istouched) {
@@ -115,7 +115,7 @@
             return count++;
           };
         })(this));
-        inject.one('absolute statistic')(entity.e(), {
+        inject.one('abs stat')(entity.e(), {
           iscommunity: count > 0
         });
         iscommunity = count > 0;

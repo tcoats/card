@@ -52,6 +52,9 @@
       };
 
       Coordinates.prototype.delta = function(entity, d) {
+        inject.one('rel stat')(entity, {
+          distancetravelled: d
+        });
         return entity.coord.p.add(d);
       };
 

@@ -8,13 +8,13 @@ define ['inject', 'hub'], (inject, hub) ->
 			inject.bind 'register ai', @register
 		
 		setup: =>
-			inject.one('register derived statistic') 'istouched',
+			# Derived statistic
+			inject.one('stat notify') 'istouched',
 				(entity, _, istouched) =>
 					if istouched
-						inject.one('absolute statistic') entity,
-							timesincetouch: 0
+						inject.one('abs stat') entity, timesincetouch: 0
 					else
-						inject.one('relative statistic') entity, timesincetouch: 1
+						inject.one('rel stat') entity, timesincetouch: 1
 		
 		step: =>
 			for entity in @entities
@@ -37,7 +37,7 @@ define ['inject', 'hub'], (inject, hub) ->
 				averagerepulsion.add diff
 			
 			istouched = averagerepulsion.mag() isnt 0
-			inject.one('absolute statistic') entity.e(), istouched: istouched
+			inject.one('abs stat') entity.e(), istouched: istouched
 			return if !istouched
 			
 			force = inject.one('calculate steering') entity.e(), averagerepulsion
@@ -63,7 +63,7 @@ define ['inject', 'hub'], (inject, hub) ->
 				averageposition.add e.coord.p # Add location
 				count++
 			
-			inject.one('absolute statistic') entity.e(),
+			inject.one('abs stat') entity.e(),
 				iscommunity: count > 0
 			iscommunity = count > 0
 			

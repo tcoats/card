@@ -6,9 +6,9 @@ define ['inject'], (inject) ->
 			
 			inject.bind 'step', @step
 			inject.bind 'register statistics', @register
-			inject.bind 'absolute statistic', @absolutestatistic
-			inject.bind 'relative statistic', @relativestatistic
-			inject.bind 'register derived statistic', @derivedstatstic
+			inject.bind 'abs stat', @absolutestatistic
+			inject.bind 'rel stat', @relativestatistic
+			inject.bind 'stat notify', @statisticnotification
 			
 		step: =>
 			#for entity in @entities
@@ -22,6 +22,8 @@ define ['inject'], (inject) ->
 		absolutestatistic: (entity, values) =>
 			stats = entity.stats
 			for key, value of values
+				#console.log "#{key}: #{value}"
+				stats[key] = 0 if !stats[key]?
 				if @derived[key]?
 					current = stats[key]
 					for derived in @derived[key]
@@ -32,9 +34,11 @@ define ['inject'], (inject) ->
 			stats = entity.stats
 			for key, value of values
 				stats[key] = 0 if !stats[key]?
-				stats[key] += value
+				p = {}
+				p[key] = stats[key] + value
+				@absolutestatistic entity, p
 		
-		derivedstatstic: (key, cb) =>
+		statisticnotification: (key, cb) =>
 			if !@derived[key]?
 				@derived[key] = []
 			@derived[key].push cb

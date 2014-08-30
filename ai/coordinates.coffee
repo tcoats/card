@@ -21,6 +21,8 @@ define ['inject'], (inject) ->
 			@entities.push entity.coord
 		
 		delta: (entity, d) =>
+			inject.one('rel stat') entity,
+				distancetravelled: d
 			entity.coord.p.add d
 		
 		eachbydistance: (p, r, cb) =>

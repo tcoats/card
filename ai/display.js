@@ -30,10 +30,10 @@
         fill(colors.bg);
         color = colors.blue;
         if (e.stats.iscommunity) {
-          color = colors.gold;
+          color = colors.red;
         }
         if (e.stats.timesincetouch < 10) {
-          color = colors.red;
+          color = colors.gold;
         }
         stroke(color);
         return ellipse(e.coord.p.x, e.coord.p.y, 16, 16);
