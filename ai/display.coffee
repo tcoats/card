@@ -13,8 +13,13 @@ define ['inject', 'colors'], (inject, colors) ->
 		
 		boid: (e) =>
 			fill colors.bg
-			stroke colors.blue
-			ellipse e.c.p.x, e.c.p.y, 16, 16
+			color = colors.blue
+			if e.ai.iscommunity
+				color = colors.gold
+			if e.ai.timesincetouch < 10
+				color = colors.red
+			stroke color
+			ellipse e.coord.p.x, e.coord.p.y, 16, 16
 		
 		register: (entity, name) =>
 			entity.d = n: name, e: -> entity

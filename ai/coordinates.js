@@ -42,17 +42,17 @@
       };
 
       Coordinates.prototype.register = function(entity, p) {
-        entity.c = {
+        entity.coord = {
           p: p,
           e: function() {
             return entity;
           }
         };
-        return this.entities.push(entity.c);
+        return this.entities.push(entity.coord);
       };
 
       Coordinates.prototype.delta = function(entity, d) {
-        return entity.c.p.add(d);
+        return entity.coord.p.add(d);
       };
 
       Coordinates.prototype.eachbydistance = function(p, r, cb) {

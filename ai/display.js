@@ -26,9 +26,17 @@
       };
 
       Display.prototype.boid = function(e) {
+        var color;
         fill(colors.bg);
-        stroke(colors.blue);
-        return ellipse(e.c.p.x, e.c.p.y, 16, 16);
+        color = colors.blue;
+        if (e.ai.iscommunity) {
+          color = colors.gold;
+        }
+        if (e.ai.timesincetouch < 10) {
+          color = colors.red;
+        }
+        stroke(color);
+        return ellipse(e.coord.p.x, e.coord.p.y, 16, 16);
       };
 
       Display.prototype.register = function(entity, name) {

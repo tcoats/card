@@ -3,7 +3,7 @@
   define('game', ['boid', 'plugins'], function(Boid) {
     var _, _i, _results;
     _results = [];
-    for (_ = _i = 0; _i <= 10; _ = ++_i) {
+    for (_ = _i = 0; _i <= 50; _ = ++_i) {
       _results.push(new Boid({
         position: createVector(random(width), random(height)),
         velocity: p5.Vector.random2D(),
@@ -13,14 +13,14 @@
     return _results;
   });
 
-  define('plugins', ['ai', 'physics', 'coordinates', 'display']);
+  define('plugins', ['statistics', 'ai', 'physics', 'coordinates', 'display']);
 
   window.setup = function() {
     createCanvas(windowWidth, windowHeight);
     requirejs.config({
       urlArgs: 'v=' + (new Date()).getTime()
     });
-    return requirejs(['colors', 'inject', 'game'], function(colors, inject) {
+    return requirejs(['inject', 'game'], function(inject) {
       return window.draw = function() {
         var exec, _i, _len, _ref, _results;
         _ref = inject.many('step');

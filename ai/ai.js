@@ -2,7 +2,7 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['inject'], function(inject) {
+  define(['inject', 'hub'], function(inject, hub) {
     var AI;
     AI = (function() {
       function AI() {
@@ -32,7 +32,6 @@
       AI.prototype.register = function(entity, n) {
         entity.ai = {
           n: n,
-          isrepulsed: false,
           e: function() {
             return entity;
           }
@@ -41,26 +40,27 @@
       };
 
       AI.prototype.separate = function(entity) {
-        var averagerepulsion, force, isrepulsed;
+        var averagerepulsion, force;
         averagerepulsion = createVector(0, 0);
-        inject.one('each by distance')(entity.e().c.p, 25, (function(_this) {
+        inject.one('each by distance')(entity.e().coord.p, 25, (function(_this) {
           return function(d, boid) {
             var diff;
-            if (boid === entity.e()) {
+            if (boid === entity.e() || (boid.ai == null)) {
               return;
             }
-            diff = p5.Vector.sub(entity.e().c.p, boid.c.p);
+            diff = p5.Vector.sub(entity.e().coord.p, boid.coord.p);
             diff.div(diff.mag() * 2);
             return averagerepulsion.add(diff);
           };
         })(this));
-        isrepulsed = averagerepulsion.mag() !== 0;
-        if (entity.isrepulsed !== isrepulsed) {
-          entity.isrepulsed = isrepulsed;
+        if (entity.timesincetouch == null) {
+          entity.timesincetouch;
         }
-        if (!isrepulsed) {
+        if (averagerepulsion.mag() === 0) {
+          entity.timesincetouch++;
           return;
         }
+        entity.timesincetouch = 0;
         force = inject.one('calculate steering')(entity.e(), averagerepulsion);
         force.mult(4.5);
         return inject.one('apply force')(entity.e(), force);
@@ -69,9 +69,9 @@
       AI.prototype.align = function(entity) {
         var averagedirection, forece;
         averagedirection = createVector(0, 0);
-        inject.one('each by distance')(entity.e().c.p, 50, (function(_this) {
+        inject.one('each by distance')(entity.e().coord.p, 50, (function(_this) {
           return function(d, boid) {
-            if (boid === entity.e()) {
+            if (boid === entity.e() || (boid.ai == null)) {
               return;
             }
             return averagedirection.add(boid.p.v);
@@ -86,23 +86,30 @@
       };
 
       AI.prototype.cohere = function(entity) {
-        var averageposition, count, direction, force;
+        var averageposition, count, direction, force, iscommunity;
         averageposition = createVector(0, 0);
         count = 0;
-        inject.one('each by distance')(entity.e().c.p, 100, (function(_this) {
+        inject.one('each by distance')(entity.e().coord.p, 100, (function(_this) {
           return function(d, boid) {
-            if (boid === entity.e()) {
+            if (boid === entity.e() || (boid.ai == null)) {
               return;
             }
-            averageposition.add(boid.c.p);
+            averageposition.add(boid.coord.p);
             return count++;
           };
         })(this));
+        if (entity.iscommunity == null) {
+          entity.iscommunity = false;
+        }
+        iscommunity = count > 0;
+        if (entity.iscommunity !== iscommunity) {
+          entity.iscommunity = iscommunity;
+        }
         if (averageposition.mag() === 0) {
           return;
         }
         averageposition.div(count);
-        direction = p5.Vector.sub(averageposition, entity.e().c.p);
+        direction = p5.Vector.sub(averageposition, entity.e().coord.p);
         force = inject.one('calculate steering')(entity.e(), direction);
         force.mult(1.0);
         return inject.one('apply force')(entity.e(), force);

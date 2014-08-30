@@ -17,11 +17,11 @@ define ['inject'], (inject) ->
 				entity.p.y = -10 if entity.p.y > height + 10
 		
 		register: (entity, p) =>
-			entity.c = p: p, e: -> entity
-			@entities.push entity.c
+			entity.coord = p: p, e: -> entity
+			@entities.push entity.coord
 		
 		delta: (entity, d) =>
-			entity.c.p.add d
+			entity.coord.p.add d
 		
 		eachbydistance: (p, r, cb) =>
 			for entity in @entities
