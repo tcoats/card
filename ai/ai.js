@@ -74,7 +74,7 @@
             if (boid === entity.e() || (boid.ai == null)) {
               return;
             }
-            return averagedirection.add(boid.p.v);
+            return averagedirection.add(boid.phys.v);
           };
         })(this));
         if (averagedirection.mag() === 0) {

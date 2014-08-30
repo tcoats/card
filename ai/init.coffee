@@ -1,12 +1,15 @@
 # # AI Testbed
 
-define 'game', ['boid', 'plugins'], (Boid) ->
+define 'game', ['inject', 'plugins'], (inject) ->
 	# Add an initial set of boids into the system
 	for _ in [0..50]
-		new Boid
-			position: createVector random(width), random(height)
-			velocity: p5.Vector.random2D()
-			name: 'boid'
+		e = {}
+		name = 'boid'
+		inject.one('register ai') e, name
+		inject.one('register statistics') e, name
+		inject.one('register physics') e, p5.Vector.random2D()
+		inject.one('register coordinates') e, createVector random(width), random(height)
+		inject.one('register display') e, name
 
 define 'plugins', [
 	'statistics'

@@ -18,17 +18,17 @@ define ['inject'], (inject) ->
 				inject.one('delta position') entity.e(), entity.v
 		
 		register: (entity, v) =>
-			entity.p = v: v, a: createVector(0, 0), e: -> entity
-			@entities.push entity.p
+			entity.phys = v: v, a: createVector(0, 0), e: -> entity
+			@entities.push entity.phys
 		
 		apply: (entity, f) =>
-			entity.p.a.add f
+			entity.phys.a.add f
 
 		calculatesteering: (entity, steer) =>
 			result = steer.get()
 			result.normalize()
 			result.mult @maxspeed
-			result.sub entity.p.v
+			result.sub entity.phys.v
 			result.limit @maxsteeringforce
 			result
 			

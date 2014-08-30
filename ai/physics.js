@@ -34,18 +34,18 @@
       };
 
       Physics.prototype.register = function(entity, v) {
-        entity.p = {
+        entity.phys = {
           v: v,
           a: createVector(0, 0),
           e: function() {
             return entity;
           }
         };
-        return this.entities.push(entity.p);
+        return this.entities.push(entity.phys);
       };
 
       Physics.prototype.apply = function(entity, f) {
-        return entity.p.a.add(f);
+        return entity.phys.a.add(f);
       };
 
       Physics.prototype.calculatesteering = function(entity, steer) {
@@ -53,7 +53,7 @@
         result = steer.get();
         result.normalize();
         result.mult(this.maxspeed);
-        result.sub(entity.p.v);
+        result.sub(entity.phys.v);
         result.limit(this.maxsteeringforce);
         return result;
       };

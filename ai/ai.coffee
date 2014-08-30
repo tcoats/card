@@ -41,7 +41,7 @@ define ['inject', 'hub'], (inject, hub) ->
 			averagedirection = createVector 0, 0
 			inject.one('each by distance') entity.e().coord.p, 50, (d, boid) =>
 				return if boid is entity.e() or !boid.ai?
-				averagedirection.add boid.p.v
+				averagedirection.add boid.phys.v
 			return if averagedirection.mag() is 0
 			
 			forece = inject.one('calculate steering') entity.e(), averagedirection
