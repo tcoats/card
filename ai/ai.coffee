@@ -3,11 +3,25 @@ define ['inject', 'boid'], (inject, Boid) ->
 		constructor: ->
 			# Add an initial set of boids into the system
 			@boids = []
-			@boids.push new Boid random(width), random(height) for _ in [0..100]
+			for _ in [0..90]
+				@boids.push new Boid(
+					createVector(random(width), random(height)),
+					p5.Vector.random2D(),
+					createVector(0, 0),
+					'boid'
+				)
+				
+			for _ in [0..10]
+				@boids.push new Boid(
+					createVector(random(width), random(height)),
+					p5.Vector.random2D(),
+					createVector(0, 0),
+					'boid2'
+				)
 	
 			inject.bind 'step', @step
 		
 		step: =>
-			boid.run @boids for boid in @boids
+			boid.step @boids for boid in @boids
 	
 	new AI()

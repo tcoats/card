@@ -2,12 +2,14 @@
 
 define 'plugins', [
 	'ai'
+	'physics'
+	'coordinates'
+	'display'
 ]
 
 window.setup = ->
-	createCanvas 1920, 1200
+	createCanvas windowWidth, windowHeight
 	requirejs.config urlArgs: 'v=' + (new Date()).getTime() # cache busting
 	requirejs ['colors', 'inject', 'plugins'], (colors, inject) ->
 		window.draw = ->
-			#background colors.bg
 			exec() for exec in inject.many 'step'
