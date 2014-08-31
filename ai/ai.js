@@ -60,13 +60,13 @@
       AI.prototype.separate = function(entity) {
         var averagerepulsion, force, istouched;
         averagerepulsion = createVector(0, 0);
-        inject.one('each by distance')(entity.e().coord.p, 25, (function(_this) {
+        inject.one('each by distance')(entity.e().phys.p, 25, (function(_this) {
           return function(d, e) {
             var diff;
             if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            diff = p5.Vector.sub(entity.e().coord.p, e.coord.p);
+            diff = p5.Vector.sub(entity.e().phys.p, e.phys.p);
             diff.div(diff.mag() * 2);
             return averagerepulsion.add(diff);
           };
@@ -79,39 +79,47 @@
           return;
         }
         force = inject.one('calculate steering')(entity.e(), averagerepulsion);
-        force.mult(4.5);
+        force.mult(3.0);
         return inject.one('apply force')(entity.e(), force);
       };
 
       AI.prototype.align = function(entity) {
-        var averagedirection, forece;
+        var averagedirection, count, force;
         averagedirection = createVector(0, 0);
-        inject.one('each by distance')(entity.e().coord.p, 50, (function(_this) {
+        count = 0;
+        inject.one('each by distance')(entity.e().phys.p, 50, (function(_this) {
           return function(d, e) {
             if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            return averagedirection.add(e.phys.v);
+            averagedirection.add(e.phys.v);
+            return count++;
           };
         })(this));
         if (averagedirection.mag() === 0) {
           return;
         }
-        forece = inject.one('calculate steering')(entity.e(), averagedirection);
-        forece.mult(1.0);
-        return inject.one('apply force')(entity.e(), forece);
+        if (count > 10) {
+          averagedirection.mult(-1);
+        }
+        force = inject.one('calculate steering')(entity.e(), averagedirection);
+        force.mult(1.0);
+        if (count > 10) {
+          force.mult(2.0);
+        }
+        return inject.one('apply force')(entity.e(), force);
       };
 
       AI.prototype.cohere = function(entity) {
         var averageposition, count, direction, force, iscommunity;
         averageposition = createVector(0, 0);
         count = 0;
-        inject.one('each by distance')(entity.e().coord.p, 100, (function(_this) {
+        inject.one('each by distance')(entity.e().phys.p, 100, (function(_this) {
           return function(d, e) {
             if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            averageposition.add(e.coord.p);
+            averageposition.add(e.phys.p);
             return count++;
           };
         })(this));
@@ -123,7 +131,10 @@
           return;
         }
         averageposition.div(count);
-        direction = p5.Vector.sub(averageposition, entity.e().coord.p);
+        direction = p5.Vector.sub(averageposition, entity.e().phys.p);
+        if (count > 10) {
+          averageposition.mult(-1);
+        }
         force = inject.one('calculate steering')(entity.e(), direction);
         force.mult(1.0);
         return inject.one('apply force')(entity.e(), force);

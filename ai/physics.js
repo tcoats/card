@@ -6,17 +6,21 @@
     var Physics;
     Physics = (function() {
       function Physics() {
+        this.eachbydistance = __bind(this.eachbydistance, this);
+        this.delta = __bind(this.delta, this);
         this.calculatesteering = __bind(this.calculatesteering, this);
         this.apply = __bind(this.apply, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
-        this.maxspeed = 3;
+        this.maxspeed = 4;
         this.maxsteeringforce = 0.05;
         this.entities = [];
         inject.bind('step', this.step);
         inject.bind('register physics', this.register);
         inject.bind('apply force', this.apply);
         inject.bind('calculate steering', this.calculatesteering);
+        inject.bind('delta position', this.delta);
+        inject.bind('each by distance', this.eachbydistance);
       }
 
       Physics.prototype.step = function() {
@@ -28,13 +32,29 @@
           entity.v.add(entity.a);
           entity.a.mult(0);
           entity.a.limit(this.maxspeed);
-          _results.push(inject.one('delta position')(entity.e(), entity.v));
+          inject.one('delta position')(entity.e(), entity.v);
+          if (entity.p.x < -10) {
+            entity.p.x = width + 10;
+          }
+          if (entity.p.x > width + 10) {
+            entity.p.x = -10;
+          }
+          if (entity.p.y < -10) {
+            entity.p.y = height + 10;
+          }
+          if (entity.p.y > height + 10) {
+            _results.push(entity.p.y = -10);
+          } else {
+            _results.push(void 0);
+          }
         }
         return _results;
       };
 
-      Physics.prototype.register = function(entity, v) {
+      Physics.prototype.register = function(entity, n, p, v) {
         entity.phys = {
+          n: n,
+          p: p,
           v: v,
           a: createVector(0, 0),
           e: function() {
@@ -56,6 +76,28 @@
         result.sub(entity.phys.v);
         result.limit(this.maxsteeringforce);
         return result;
+      };
+
+      Physics.prototype.delta = function(entity, d) {
+        inject.one('rel stat')(entity, {
+          distancetravelled: d
+        });
+        return entity.phys.p.add(d);
+      };
+
+      Physics.prototype.eachbydistance = function(p, r, cb) {
+        var distance, entity, _i, _len, _ref, _results;
+        _ref = this.entities;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          entity = _ref[_i];
+          distance = p5.Vector.dist(p, entity.p);
+          if (distance > r) {
+            continue;
+          }
+          _results.push(cb(distance, entity.e()));
+        }
+        return _results;
       };
 
       return Physics;

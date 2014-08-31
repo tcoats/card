@@ -30,9 +30,9 @@ define ['inject', 'hub'], (inject, hub) ->
 		
 		separate: (entity) =>
 			averagerepulsion = createVector 0, 0
-			inject.one('each by distance') entity.e().coord.p, 25, (d, e) =>
+			inject.one('each by distance') entity.e().phys.p, 25, (d, e) =>
 				return if e is entity.e() or !e.ai?
-				diff = p5.Vector.sub entity.e().coord.p, e.coord.p
+				diff = p5.Vector.sub entity.e().phys.p, e.phys.p
 				diff.div diff.mag() * 2
 				averagerepulsion.add diff
 			
@@ -41,26 +41,31 @@ define ['inject', 'hub'], (inject, hub) ->
 			return if !istouched
 			
 			force = inject.one('calculate steering') entity.e(), averagerepulsion
-			force.mult 4.5
+			force.mult 3.0
 			inject.one('apply force') entity.e(), force
 
 		align: (entity) =>
 			averagedirection = createVector 0, 0
-			inject.one('each by distance') entity.e().coord.p, 50, (d, e) =>
+			count = 0
+			inject.one('each by distance') entity.e().phys.p, 50, (d, e) =>
 				return if e is entity.e() or !e.ai?
 				averagedirection.add e.phys.v
+				count++
 			return if averagedirection.mag() is 0
 			
-			forece = inject.one('calculate steering') entity.e(), averagedirection
-			forece.mult 1.0
-			inject.one('apply force') entity.e(), forece
+			averagedirection.mult -1 if count > 10
+			
+			force = inject.one('calculate steering') entity.e(), averagedirection
+			force.mult 1.0
+			force.mult 2.0 if count > 10
+			inject.one('apply force') entity.e(), force
 
 		cohere: (entity) =>
 			averageposition = createVector 0, 0
 			count = 0
-			inject.one('each by distance') entity.e().coord.p, 100, (d, e) =>
+			inject.one('each by distance') entity.e().phys.p, 100, (d, e) =>
 				return if e is entity.e() or !e.ai?
-				averageposition.add e.coord.p # Add location
+				averageposition.add e.phys.p # Add location
 				count++
 			
 			inject.one('abs stat') entity.e(),
@@ -69,7 +74,10 @@ define ['inject', 'hub'], (inject, hub) ->
 			
 			return if averageposition.mag() is 0
 			averageposition.div count
-			direction = p5.Vector.sub averageposition, entity.e().coord.p
+			direction = p5.Vector.sub averageposition, entity.e().phys.p
+			
+			averageposition.mult -1 if count > 10
+			
 			force = inject.one('calculate steering') entity.e(), direction
 			force.mult 1.0
 			inject.one('apply force') entity.e(), force

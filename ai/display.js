@@ -20,7 +20,11 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           entity = _ref[_i];
-          _results.push(this[entity.n](entity.e()));
+          if (this[entity.n] != null) {
+            _results.push(this[entity.n](entity.e()));
+          } else {
+            _results.push(void 0);
+          }
         }
         return _results;
       };
@@ -36,7 +40,7 @@
           color = colors.gold;
         }
         stroke(color);
-        return ellipse(e.coord.p.x, e.coord.p.y, 16, 16);
+        return ellipse(e.phys.p.x, e.phys.p.y, 16, 16);
       };
 
       Display.prototype.register = function(entity, name) {

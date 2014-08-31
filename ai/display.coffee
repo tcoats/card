@@ -9,7 +9,7 @@ define ['inject', 'colors'], (inject, colors) ->
 		step: =>
 			#background colors.bg
 			for entity in @entities
-				@[entity.n] entity.e()
+				@[entity.n] entity.e() if @[entity.n]?
 		
 		boid: (e) =>
 			#console.log e.stats.distancetravelled
@@ -20,7 +20,7 @@ define ['inject', 'colors'], (inject, colors) ->
 			if e.stats.timesincetouch < 10
 				color = colors.gold
 			stroke color
-			ellipse e.coord.p.x, e.coord.p.y, 16, 16
+			ellipse e.phys.p.x, e.phys.p.y, 16, 16
 		
 		register: (entity, name) =>
 			entity.d = n: name, e: -> entity
