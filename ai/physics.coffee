@@ -1,7 +1,7 @@
 define ['inject', 'p2'], (inject, p2) ->
 	class Physics
 		constructor: ->
-			@maxspeed = 4
+			@maxspeed = 120
 			@maxsteeringforce = 30
 			@entities = []
 			@world = new p2.World gravity: [0, 0]
@@ -17,9 +17,9 @@ define ['inject', 'p2'], (inject, p2) ->
 			@world.step 1 / 60
 			for entity in @entities
 				length = p2.vec2.len entity.b.velocity
-				if length > 120
+				if length > @maxspeed
 					p2.vec2.normalize entity.b.velocity, entity.b.velocity
-					p2.vec2.scale entity.b.velocity, entity.b.velocity, 120
+					p2.vec2.scale entity.b.velocity, entity.b.velocity, @maxspeed
 				entity.b.position[0] = width + 10 if entity.b.position[0] < -10
 				entity.b.position[0] = -10 if entity.b.position[0] > width + 10
 				entity.b.position[1] = height + 10 if entity.b.position[1] < -10

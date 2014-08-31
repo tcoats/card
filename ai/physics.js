@@ -11,7 +11,7 @@
         this.apply = __bind(this.apply, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
-        this.maxspeed = 4;
+        this.maxspeed = 120;
         this.maxsteeringforce = 30;
         this.entities = [];
         this.world = new p2.World({
@@ -32,9 +32,9 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           entity = _ref[_i];
           length = p2.vec2.len(entity.b.velocity);
-          if (length > 120) {
+          if (length > this.maxspeed) {
             p2.vec2.normalize(entity.b.velocity, entity.b.velocity);
-            p2.vec2.scale(entity.b.velocity, entity.b.velocity, 120);
+            p2.vec2.scale(entity.b.velocity, entity.b.velocity, this.maxspeed);
           }
           if (entity.b.position[0] < -10) {
             entity.b.position[0] = width + 10;
