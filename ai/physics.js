@@ -12,8 +12,11 @@
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
         this.maxspeed = 4;
-        this.maxsteeringforce = 0.05;
+        this.maxsteeringforce = 30;
         this.entities = [];
+        this.world = new p2.World({
+          gravity: [0, 0]
+        });
         inject.bind('step', this.step);
         inject.bind('register physics', this.register);
         inject.bind('apply force', this.apply);
@@ -22,29 +25,28 @@
       }
 
       Physics.prototype.step = function() {
-        var entity, _i, _len, _ref, _results;
+        var entity, length, _i, _len, _ref, _results;
+        this.world.step(1 / 60);
         _ref = this.entities;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           entity = _ref[_i];
-          entity.v.add(entity.a);
-          entity.a.mult(0);
-          entity.a.limit(this.maxspeed);
-          inject.one('rel stat')(entity.e(), {
-            distancetravelled: entity.v
-          });
-          entity.p.add(entity.v);
-          if (entity.p.x < -10) {
-            entity.p.x = width + 10;
+          length = p2.vec2.len(entity.b.velocity);
+          if (length > 120) {
+            p2.vec2.normalize(entity.b.velocity, entity.b.velocity);
+            p2.vec2.scale(entity.b.velocity, entity.b.velocity, 120);
           }
-          if (entity.p.x > width + 10) {
-            entity.p.x = -10;
+          if (entity.b.position[0] < -10) {
+            entity.b.position[0] = width + 10;
           }
-          if (entity.p.y < -10) {
-            entity.p.y = height + 10;
+          if (entity.b.position[0] > width + 10) {
+            entity.b.position[0] = -10;
           }
-          if (entity.p.y > height + 10) {
-            _results.push(entity.p.y = -10);
+          if (entity.b.position[1] < -10) {
+            entity.b.position[1] = height + 10;
+          }
+          if (entity.b.position[1] > height + 10) {
+            _results.push(entity.b.position[1] = -10);
           } else {
             _results.push(void 0);
           }
@@ -53,11 +55,20 @@
       };
 
       Physics.prototype.register = function(entity, n, p, v) {
+        var body, shape;
+        body = new p2.Body({
+          mass: 5,
+          position: p,
+          velocity: v
+        });
+        body.damping = 0;
+        shape = new p2.Circle(8);
+        body.addShape(shape);
+        this.world.addBody(body);
         return this.entities.push(entity.phys = {
           n: n,
-          p: p,
-          v: v,
-          a: createVector(0, 0),
+          b: body,
+          s: shape,
           e: function() {
             return entity;
           }
@@ -65,16 +76,19 @@
       };
 
       Physics.prototype.apply = function(entity, f) {
-        return entity.phys.a.add(f);
+        return p2.vec2.add(entity.phys.b.force, entity.phys.b.force, f);
       };
 
       Physics.prototype.calculatesteering = function(entity, steer) {
-        var result;
-        result = steer.get();
-        result.normalize();
-        result.mult(this.maxspeed);
-        result.sub(entity.phys.v);
-        result.limit(this.maxsteeringforce);
+        var length, result;
+        result = [0, 0];
+        p2.vec2.normalize(result, steer);
+        p2.vec2.scale(result, result, this.maxspeed);
+        p2.vec2.sub(result, result, entity.phys.b.velocity);
+        length = p2.vec2.len(result);
+        if (length > this.maxsteeringforce) {
+          p2.vec2.scale(result, result, this.maxsteeringforce / length);
+        }
         return result;
       };
 
@@ -84,7 +98,7 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           entity = _ref[_i];
-          distance = p5.Vector.dist(p, entity.p);
+          distance = p2.vec2.dist(p, entity.b.position);
           if (distance > r) {
             continue;
           }

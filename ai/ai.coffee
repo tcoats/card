@@ -1,4 +1,4 @@
-define ['inject', 'hub'], (inject, hub) ->
+define ['inject', 'hub', 'p2'], (inject, hub, p2) ->
 	class AI
 		constructor: ->
 			@entities = []
@@ -21,6 +21,7 @@ define ['inject', 'hub'], (inject, hub) ->
 				@separate entity
 				@align entity
 				@cohere entity
+				#inject.one('apply force') entity.e(), [0, 600]
 		
 		register: (entity, n) =>
 			entity.ai =
@@ -29,57 +30,68 @@ define ['inject', 'hub'], (inject, hub) ->
 			@entities.push entity.ai
 		
 		separate: (entity) =>
-			averagerepulsion = createVector 0, 0
-			inject.one('each by distance') entity.e().phys.p, 25, (d, e) =>
+			averagerepulsion = [0, 0]
+			inject.one('each by distance') entity.e().phys.b.position, 25, (d, e) =>
 				return if e is entity.e() or !e.ai?
-				diff = p5.Vector.sub entity.e().phys.p, e.phys.p
-				diff.div diff.mag() * 2
-				averagerepulsion.add diff
+				diff = [0, 0]
+				p2.vec2.sub diff, entity.e().phys.b.position, e.phys.b.position
+				p2.vec2.normalize diff, diff
+				p2.vec2.add averagerepulsion, averagerepulsion, diff
 			
-			istouched = averagerepulsion.mag() isnt 0
+			istouched = p2.vec2.len(averagerepulsion) isnt 0
 			inject.one('abs stat') entity.e(), istouched: istouched
 			return if !istouched
 			
+			p2.vec2.scale averagerepulsion, averagerepulsion, 800
+			inject.one('apply force') entity.e(), averagerepulsion
+			return
+			
 			force = inject.one('calculate steering') entity.e(), averagerepulsion
-			force.mult 3.0
+			p2.vec2.scale force, force, 800
 			inject.one('apply force') entity.e(), force
 
 		align: (entity) =>
-			averagedirection = createVector 0, 0
+			averagedirection = [0, 0]
 			count = 0
-			inject.one('each by distance') entity.e().phys.p, 50, (d, e) =>
+			inject.one('each by distance') entity.e().phys.b.position, 50, (d, e) =>
 				return if e is entity.e() or !e.ai?
-				averagedirection.add e.phys.v
+				p2.vec2.add averagedirection, averagedirection, e.phys.b.velocity
 				count++
-			return if averagedirection.mag() is 0
+			return if p2.vec2.len(averagedirection) is 0
 			
-			averagedirection.mult -1 if count > 10
+			p2.vec2.normalize averagedirection, averagedirection
+			p2.vec2.scale averagedirection, averagedirection, 100
+			inject.one('apply force') entity.e(), averagedirection
+			return
 			
 			force = inject.one('calculate steering') entity.e(), averagedirection
-			force.mult 1.0
-			force.mult 2.0 if count > 10
+			p2.vec2.scale force, force, 800
 			inject.one('apply force') entity.e(), force
 
 		cohere: (entity) =>
-			averageposition = createVector 0, 0
+			averageposition = [0, 0]
 			count = 0
-			inject.one('each by distance') entity.e().phys.p, 100, (d, e) =>
+			inject.one('each by distance') entity.e().phys.b.position, 100, (d, e) =>
 				return if e is entity.e() or !e.ai?
-				averageposition.add e.phys.p # Add location
+				p2.vec2.add averageposition, averageposition, e.phys.b.position
 				count++
 			
 			inject.one('abs stat') entity.e(),
 				iscommunity: count > 0
 			iscommunity = count > 0
 			
-			return if averageposition.mag() is 0
-			averageposition.div count
-			direction = p5.Vector.sub averageposition, entity.e().phys.p
+			return if p2.vec2.len(averageposition) is 0
+			p2.vec2.scale averageposition, averageposition, 1 / count
+			direction = [0, 0]
+			p2.vec2.sub averageposition, averageposition, entity.e().phys.b.position
 			
-			averageposition.mult -1 if count > 10
+			p2.vec2.normalize averageposition, averageposition
+			p2.vec2.scale averageposition, averageposition, 800
+			inject.one('apply force') entity.e(), averageposition
+			return
 			
 			force = inject.one('calculate steering') entity.e(), direction
-			force.mult 1.0
+			p2.vec2.scale force, force, 800
 			inject.one('apply force') entity.e(), force
 	
 	new AI()

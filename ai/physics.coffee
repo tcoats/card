@@ -2,8 +2,10 @@ define ['inject', 'p2'], (inject, p2) ->
 	class Physics
 		constructor: ->
 			@maxspeed = 4
-			@maxsteeringforce = 0.05
+			@maxsteeringforce = 30
 			@entities = []
+			@world = new p2.World gravity: [0, 0]
+			
 			inject.bind 'step', @step
 			inject.bind 'register physics', @register
 			inject.bind 'apply force', @apply
@@ -12,39 +14,45 @@ define ['inject', 'p2'], (inject, p2) ->
 		
 		# Integrate
 		step: =>
+			@world.step 1 / 60
 			for entity in @entities
-				entity.v.add entity.a
-				entity.a.mult 0
-				entity.a.limit @maxspeed
-				inject.one('rel stat') entity.e(), distancetravelled: entity.v
-				entity.p.add entity.v
-				entity.p.x = width + 10 if entity.p.x < -10
-				entity.p.x = -10 if entity.p.x > width + 10
-				entity.p.y = height + 10 if entity.p.y < -10
-				entity.p.y = -10 if entity.p.y > height + 10
+				length = p2.vec2.len entity.b.velocity
+				if length > 120
+					p2.vec2.normalize entity.b.velocity, entity.b.velocity
+					p2.vec2.scale entity.b.velocity, entity.b.velocity, 120
+				entity.b.position[0] = width + 10 if entity.b.position[0] < -10
+				entity.b.position[0] = -10 if entity.b.position[0] > width + 10
+				entity.b.position[1] = height + 10 if entity.b.position[1] < -10
+				entity.b.position[1] = -10 if entity.b.position[1] > height + 10
 		
 		register: (entity, n, p, v) =>
+			body = new p2.Body mass: 5, position: p, velocity: v
+			body.damping = 0
+			shape = new p2.Circle 8
+			body.addShape shape
+			@world.addBody body
 			@entities.push entity.phys =
 				n: n
-				p: p
-				v: v
-				a: createVector(0, 0)
+				b: body
+				s: shape
 				e: -> entity
 		
 		apply: (entity, f) =>
-			entity.phys.a.add f
+			p2.vec2.add entity.phys.b.force, entity.phys.b.force, f
 
 		calculatesteering: (entity, steer) =>
-			result = steer.get()
-			result.normalize()
-			result.mult @maxspeed
-			result.sub entity.phys.v
-			result.limit @maxsteeringforce
+			result = [0, 0]
+			p2.vec2.normalize result, steer
+			p2.vec2.scale result, result, @maxspeed
+			p2.vec2.sub result, result, entity.phys.b.velocity
+			length = p2.vec2.len result
+			if length > @maxsteeringforce
+				p2.vec2.scale result, result, @maxsteeringforce / length
 			result
 		
 		eachbydistance: (p, r, cb) =>
 			for entity in @entities
-				distance = p5.Vector.dist p, entity.p
+				distance = p2.vec2.dist p, entity.b.position
 				continue if distance > r
 				cb distance, entity.e()
 			
