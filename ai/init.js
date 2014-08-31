@@ -19,7 +19,10 @@
   window.setup = function() {
     createCanvas(windowWidth, windowHeight);
     requirejs.config({
-      urlArgs: 'v=' + (new Date()).getTime()
+      urlArgs: 'v=' + (new Date()).getTime(),
+      paths: {
+        p2: 'p2.min'
+      }
     });
     return requirejs(['inject', 'game'], function(inject) {
       var setup, _i, _len, _ref;

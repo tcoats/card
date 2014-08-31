@@ -2,12 +2,11 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['inject'], function(inject) {
+  define(['inject', 'p2'], function(inject, p2) {
     var Physics;
     Physics = (function() {
       function Physics() {
         this.eachbydistance = __bind(this.eachbydistance, this);
-        this.delta = __bind(this.delta, this);
         this.calculatesteering = __bind(this.calculatesteering, this);
         this.apply = __bind(this.apply, this);
         this.register = __bind(this.register, this);
@@ -19,7 +18,6 @@
         inject.bind('register physics', this.register);
         inject.bind('apply force', this.apply);
         inject.bind('calculate steering', this.calculatesteering);
-        inject.bind('delta position', this.delta);
         inject.bind('each by distance', this.eachbydistance);
       }
 
@@ -32,7 +30,10 @@
           entity.v.add(entity.a);
           entity.a.mult(0);
           entity.a.limit(this.maxspeed);
-          inject.one('delta position')(entity.e(), entity.v);
+          inject.one('rel stat')(entity.e(), {
+            distancetravelled: entity.v
+          });
+          entity.p.add(entity.v);
           if (entity.p.x < -10) {
             entity.p.x = width + 10;
           }
@@ -52,7 +53,7 @@
       };
 
       Physics.prototype.register = function(entity, n, p, v) {
-        entity.phys = {
+        return this.entities.push(entity.phys = {
           n: n,
           p: p,
           v: v,
@@ -60,8 +61,7 @@
           e: function() {
             return entity;
           }
-        };
-        return this.entities.push(entity.phys);
+        });
       };
 
       Physics.prototype.apply = function(entity, f) {
@@ -76,13 +76,6 @@
         result.sub(entity.phys.v);
         result.limit(this.maxsteeringforce);
         return result;
-      };
-
-      Physics.prototype.delta = function(entity, d) {
-        inject.one('rel stat')(entity, {
-          distancetravelled: d
-        });
-        return entity.phys.p.add(d);
       };
 
       Physics.prototype.eachbydistance = function(p, r, cb) {

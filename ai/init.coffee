@@ -19,7 +19,9 @@ define 'game', ['inject', 'plugins'], (inject) ->
 
 window.setup = ->
 	createCanvas windowWidth, windowHeight
-	requirejs.config urlArgs: 'v=' + (new Date()).getTime() # cache busting
+	requirejs.config
+		urlArgs: 'v=' + (new Date()).getTime() # cache busting
+		paths: p2: 'p2.min'
 	requirejs ['inject', 'game'], (inject) ->
 		setup() for setup in inject.many 'setup'
 		window.draw = ->

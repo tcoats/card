@@ -1,4 +1,4 @@
-define ['inject'], (inject) ->
+define ['inject', 'p2'], (inject, p2) ->
 	class Physics
 		constructor: ->
 			@maxspeed = 4
@@ -8,7 +8,6 @@ define ['inject'], (inject) ->
 			inject.bind 'register physics', @register
 			inject.bind 'apply force', @apply
 			inject.bind 'calculate steering', @calculatesteering
-			inject.bind 'delta position', @delta
 			inject.bind 'each by distance', @eachbydistance
 		
 		# Integrate
@@ -17,15 +16,20 @@ define ['inject'], (inject) ->
 				entity.v.add entity.a
 				entity.a.mult 0
 				entity.a.limit @maxspeed
-				inject.one('delta position') entity.e(), entity.v
+				inject.one('rel stat') entity.e(), distancetravelled: entity.v
+				entity.p.add entity.v
 				entity.p.x = width + 10 if entity.p.x < -10
 				entity.p.x = -10 if entity.p.x > width + 10
 				entity.p.y = height + 10 if entity.p.y < -10
 				entity.p.y = -10 if entity.p.y > height + 10
 		
 		register: (entity, n, p, v) =>
-			entity.phys = n: n, p: p, v: v, a: createVector(0, 0), e: -> entity
-			@entities.push entity.phys
+			@entities.push entity.phys =
+				n: n
+				p: p
+				v: v
+				a: createVector(0, 0)
+				e: -> entity
 		
 		apply: (entity, f) =>
 			entity.phys.a.add f
@@ -37,11 +41,6 @@ define ['inject'], (inject) ->
 			result.sub entity.phys.v
 			result.limit @maxsteeringforce
 			result
-		
-		delta: (entity, d) =>
-			inject.one('rel stat') entity,
-				distancetravelled: d
-			entity.phys.p.add d
 		
 		eachbydistance: (p, r, cb) =>
 			for entity in @entities
