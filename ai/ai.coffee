@@ -21,6 +21,7 @@ define ['inject', 'hub', 'p2'], (inject, hub, p2) ->
 				@separate entity
 				@align entity
 				@cohere entity
+				#inject.one('apply force') entity.e(), [0, 600]
 		
 		register: (entity, n) =>
 			entity.ai =
