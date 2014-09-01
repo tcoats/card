@@ -40,7 +40,7 @@
           color = colors.gold;
         }
         stroke(color);
-        return ellipse(e.phys.p.x, e.phys.p.y, 16, 16);
+        return ellipse(e.phys.b.position[0], e.phys.b.position[1], 16, 16);
       };
 
       Display.prototype.register = function(entity, name) {

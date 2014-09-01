@@ -2,7 +2,7 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['inject', 'hub'], function(inject, hub) {
+  define(['inject', 'hub', 'p2'], function(inject, hub, p2) {
     var AI;
     AI = (function() {
       function AI() {
@@ -59,67 +59,64 @@
 
       AI.prototype.separate = function(entity) {
         var averagerepulsion, force, istouched;
-        averagerepulsion = createVector(0, 0);
-        inject.one('each by distance')(entity.e().phys.p, 25, (function(_this) {
+        averagerepulsion = [0, 0];
+        inject.one('each by distance')(entity.e().phys.b.position, 25, (function(_this) {
           return function(d, e) {
             var diff;
             if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            diff = p5.Vector.sub(entity.e().phys.p, e.phys.p);
-            diff.div(diff.mag() * 2);
-            return averagerepulsion.add(diff);
+            diff = [0, 0];
+            p2.vec2.sub(diff, entity.e().phys.b.position, e.phys.b.position);
+            p2.vec2.normalize(diff, diff);
+            return p2.vec2.add(averagerepulsion, averagerepulsion, diff);
           };
         })(this));
-        istouched = averagerepulsion.mag() !== 0;
+        istouched = p2.vec2.len(averagerepulsion) !== 0;
         inject.one('abs stat')(entity.e(), {
           istouched: istouched
         });
         if (!istouched) {
           return;
         }
-        force = inject.one('calculate steering')(entity.e(), averagerepulsion);
-        force.mult(3.0);
+        inject.one('scale to max velocity')(averagerepulsion);
+        force = inject.one('calculate steering')(entity.e().phys.b.velocity, averagerepulsion);
+        p2.vec2.scale(force, force, 2);
         return inject.one('apply force')(entity.e(), force);
       };
 
       AI.prototype.align = function(entity) {
         var averagedirection, count, force;
-        averagedirection = createVector(0, 0);
+        averagedirection = [0, 0];
         count = 0;
-        inject.one('each by distance')(entity.e().phys.p, 50, (function(_this) {
+        inject.one('each by distance')(entity.e().phys.b.position, 50, (function(_this) {
           return function(d, e) {
             if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            averagedirection.add(e.phys.v);
+            p2.vec2.add(averagedirection, averagedirection, e.phys.b.velocity);
             return count++;
           };
         })(this));
-        if (averagedirection.mag() === 0) {
+        if (p2.vec2.len(averagedirection) === 0) {
           return;
         }
-        if (count > 10) {
-          averagedirection.mult(-1);
-        }
-        force = inject.one('calculate steering')(entity.e(), averagedirection);
-        force.mult(1.0);
-        if (count > 10) {
-          force.mult(2.0);
-        }
+        inject.one('scale to max velocity')(averagedirection);
+        force = inject.one('calculate steering')(entity.e().phys.b.velocity, averagedirection);
+        p2.vec2.scale(force, force, 0.5);
         return inject.one('apply force')(entity.e(), force);
       };
 
       AI.prototype.cohere = function(entity) {
-        var averageposition, count, direction, force, iscommunity;
-        averageposition = createVector(0, 0);
+        var averageposition, count, force, iscommunity, targetvelocity;
+        averageposition = [0, 0];
         count = 0;
-        inject.one('each by distance')(entity.e().phys.p, 100, (function(_this) {
+        inject.one('each by distance')(entity.e().phys.b.position, 100, (function(_this) {
           return function(d, e) {
             if (e === entity.e() || (e.ai == null)) {
               return;
             }
-            averageposition.add(e.phys.p);
+            p2.vec2.add(averageposition, averageposition, e.phys.b.position);
             return count++;
           };
         })(this));
@@ -127,16 +124,13 @@
           iscommunity: count > 0
         });
         iscommunity = count > 0;
-        if (averageposition.mag() === 0) {
+        if (p2.vec2.len(averageposition) === 0) {
           return;
         }
-        averageposition.div(count);
-        direction = p5.Vector.sub(averageposition, entity.e().phys.p);
-        if (count > 10) {
-          averageposition.mult(-1);
-        }
-        force = inject.one('calculate steering')(entity.e(), direction);
-        force.mult(1.0);
+        p2.vec2.scale(averageposition, averageposition, 1 / count);
+        targetvelocity = inject.one('calculate seeking')(entity.e().phys.b.position, averageposition);
+        force = inject.one('calculate steering')(entity.e().phys.b.velocity, targetvelocity);
+        p2.vec2.scale(force, force, 0.5);
         return inject.one('apply force')(entity.e(), force);
       };
 
