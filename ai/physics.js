@@ -14,8 +14,8 @@
         this.apply = __bind(this.apply, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
-        this.maxvelocity = 150;
-        this.defaultsteeringforce = 300;
+        this.maxvelocity = 600;
+        this.defaultsteeringforce = 1200;
         this.entities = [];
         this.world = new p2.World({
           gravity: [0, 0]

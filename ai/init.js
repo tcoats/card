@@ -5,7 +5,7 @@
   define('game', ['inject', 'plugins'], function(inject) {
     var e, name, _, _i, _results;
     _results = [];
-    for (_ = _i = 0; _i <= 50; _ = ++_i) {
+    for (_ = _i = 0; _i <= 100; _ = ++_i) {
       e = {};
       name = 'boid';
       inject.one('register ai')(e, name);

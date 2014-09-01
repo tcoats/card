@@ -130,7 +130,7 @@
         p2.vec2.scale(averageposition, averageposition, 1 / count);
         targetvelocity = inject.one('calculate seeking')(entity.e().phys.b.position, averageposition);
         force = inject.one('calculate steering')(entity.e().phys.b.velocity, targetvelocity);
-        p2.vec2.scale(force, force, 0.5);
+        p2.vec2.scale(force, force, 1);
         return inject.one('apply force')(entity.e(), force);
       };
 

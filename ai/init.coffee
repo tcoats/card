@@ -9,7 +9,7 @@ define 'plugins', [
 
 define 'game', ['inject', 'plugins'], (inject) ->
 	# Add an initial set of boids into the system
-	for _ in [0..50]
+	for _ in [0..100]
 		e = {}
 		name = 'boid'
 		inject.one('register ai') e, name

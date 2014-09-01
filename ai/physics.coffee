@@ -1,8 +1,8 @@
 define ['inject', 'p2'], (inject, p2) ->
 	class Physics
 		constructor: ->
-			@maxvelocity = 150
-			@defaultsteeringforce = 300
+			@maxvelocity = 600
+			@defaultsteeringforce = 1200
 			@entities = []
 			@world = new p2.World gravity: [0, 0]
 			
