@@ -7,7 +7,7 @@ define ['inject', 'colors'], (inject, colors) ->
 		
 		# Integrate
 		step: =>
-			#background colors.bg
+			background colors.bg
 			for entity in @entities
 				@[entity.n] entity.e() if @[entity.n]?
 		
@@ -19,6 +19,11 @@ define ['inject', 'colors'], (inject, colors) ->
 			if e.stats.timesincetouch < 10
 				color = colors.gold
 			stroke color
+			ellipse e.phys.b.position[0], e.phys.b.position[1], 16, 16
+		
+		unit: (e) =>
+			fill colors.bg
+			stroke colors.gold
 			ellipse e.phys.b.position[0], e.phys.b.position[1], 16, 16
 		
 		register: (entity, name) =>

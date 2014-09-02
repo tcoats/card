@@ -14,6 +14,7 @@ define ['inject', 'p2'], (inject, p2) ->
 			inject.one('each by distance') @e.phys.b.position, 25, (d, e) =>
 				return if e is @e or !e.ai?
 				diff = [0, 0]
+				# proportional to distance from other?
 				p2.vec2.sub diff, @e.phys.b.position, e.phys.b.position
 				p2.vec2.normalize diff, diff
 				p2.vec2.add averagerepulsion, averagerepulsion, diff

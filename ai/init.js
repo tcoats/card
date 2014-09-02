@@ -2,7 +2,37 @@
 (function() {
   define('plugins', ['statistics', 'ai', 'physics', 'display']);
 
-  define('game', ['inject', 'plugins'], function(inject) {});
+  define('game', ['inject', 'plugins'], function(inject) {
+    var u, u1, u2, u3, u4, _, _i;
+    for (_ = _i = 0; _i <= 100; _ = ++_i) {
+      u = {};
+      inject.one('register ai')(u, 'unit');
+      inject.one('register statistics')(u);
+      inject.one('register physics')(u, 'unit', [random(width), random(height)], [0, 0]);
+      inject.one('register display')(u, 'unit');
+    }
+    return;
+    u1 = {};
+    inject.one('register ai')(u1, 'unit');
+    inject.one('register statistics')(u1);
+    inject.one('register physics')(u1, 'unit', [100, 100], [0, 0]);
+    inject.one('register display')(u1, 'unit');
+    u2 = {};
+    inject.one('register ai')(u2, 'unit');
+    inject.one('register statistics')(u2);
+    inject.one('register physics')(u2, 'unit', [130, 100], [0, 0]);
+    inject.one('register display')(u2, 'unit');
+    u3 = {};
+    inject.one('register ai')(u3, 'unit');
+    inject.one('register statistics')(u3);
+    inject.one('register physics')(u3, 'unit', [140, 100], [0, 0]);
+    inject.one('register display')(u3, 'unit');
+    u4 = {};
+    inject.one('register ai')(u4, 'unit');
+    inject.one('register statistics')(u4);
+    inject.one('register physics')(u4, 'unit', [120, 120], [0, 0]);
+    return inject.one('register display')(u4, 'unit');
+  });
 
   window.setup = function() {
     createCanvas(windowWidth, windowHeight);

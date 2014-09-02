@@ -2,7 +2,7 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  define(['inject', 'boid'], function(inject, Boid) {
+  define(['inject', 'boid', 'unit'], function(inject, Boid, Unit) {
     var AI;
     AI = (function() {
       function AI() {
@@ -11,7 +11,8 @@
         this.setup = __bind(this.setup, this);
         this.entities = [];
         this.types = {
-          boid: Boid
+          boid: Boid,
+          unit: Unit
         };
         inject.bind('setup', this.setup);
         inject.bind('step', this.step);

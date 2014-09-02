@@ -7,6 +7,7 @@
     Display = (function() {
       function Display() {
         this.register = __bind(this.register, this);
+        this.unit = __bind(this.unit, this);
         this.boid = __bind(this.boid, this);
         this.step = __bind(this.step, this);
         this.entities = [];
@@ -16,6 +17,7 @@
 
       Display.prototype.step = function() {
         var entity, _i, _len, _ref, _results;
+        background(colors.bg);
         _ref = this.entities;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -40,6 +42,12 @@
           color = colors.gold;
         }
         stroke(color);
+        return ellipse(e.phys.b.position[0], e.phys.b.position[1], 16, 16);
+      };
+
+      Display.prototype.unit = function(e) {
+        fill(colors.bg);
+        stroke(colors.gold);
         return ellipse(e.phys.b.position[0], e.phys.b.position[1], 16, 16);
       };
 

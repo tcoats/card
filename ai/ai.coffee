@@ -1,9 +1,10 @@
-define ['inject', 'boid'], (inject, Boid) ->
+define ['inject', 'boid', 'unit'], (inject, Boid, Unit) ->
 	class AI
 		constructor: ->
 			@entities = []
 			@types =
 				boid: Boid
+				unit: Unit
 			inject.bind 'setup', @setup
 			inject.bind 'step', @step
 			inject.bind 'register ai', @register

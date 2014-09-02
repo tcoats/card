@@ -12,6 +12,8 @@
         this._steer = __bind(this._steer, this);
         this.scaletomaxvelocity = __bind(this.scaletomaxvelocity, this);
         this.apply = __bind(this.apply, this);
+        this.unit = __bind(this.unit, this);
+        this.boid = __bind(this.boid, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
         this.maxvelocity = 600;
@@ -60,6 +62,12 @@
       };
 
       Physics.prototype.register = function(entity, n, p, v) {
+        if (this[n] != null) {
+          return this[n](entity, p, v);
+        }
+      };
+
+      Physics.prototype.boid = function(entity, p, v) {
         var body, shape;
         body = new p2.Body({
           mass: 1,
@@ -71,7 +79,26 @@
         body.addShape(shape);
         this.world.addBody(body);
         return this.entities.push(entity.phys = {
-          n: n,
+          b: body,
+          s: shape,
+          e: function() {
+            return entity;
+          }
+        });
+      };
+
+      Physics.prototype.unit = function(entity, p, v) {
+        var body, shape;
+        body = new p2.Body({
+          mass: 1,
+          position: p,
+          velocity: v
+        });
+        body.damping = 0.5;
+        shape = new p2.Circle(8);
+        body.addShape(shape);
+        this.world.addBody(body);
+        return this.entities.push(entity.phys = {
           b: body,
           s: shape,
           e: function() {
