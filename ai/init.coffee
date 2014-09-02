@@ -9,13 +9,13 @@ define 'plugins', [
 
 define 'game', ['inject', 'plugins'], (inject) ->
 	# Add an initial set of boids into the system
-	for _ in [0..100]
-		e = {}
-		name = 'boid'
-		inject.one('register ai') e, name
-		inject.one('register statistics') e
-		inject.one('register physics') e, 'circle', [random(width), random(height)], p5.Vector.random2D().mult(60).array()
-		inject.one('register display') e, name
+	#for _ in [0..100]
+	#	e = {}
+	#	name = 'boid'
+	#	inject.one('register ai') e, name
+	#	inject.one('register statistics') e
+	#	inject.one('register physics') e, 'circle', [random(width), random(height)], p5.Vector.random2D().mult(60).array()
+	#	inject.one('register display') e, name
 
 window.setup = ->
 	createCanvas windowWidth, windowHeight

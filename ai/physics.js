@@ -62,7 +62,7 @@
       Physics.prototype.register = function(entity, n, p, v) {
         var body, shape;
         body = new p2.Body({
-          mass: 5,
+          mass: 1,
           position: p,
           velocity: v
         });

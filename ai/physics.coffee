@@ -28,7 +28,7 @@ define ['inject', 'p2'], (inject, p2) ->
 				entity.b.position[1] = -10 if entity.b.position[1] > height + 10
 		
 		register: (entity, n, p, v) =>
-			body = new p2.Body mass: 5, position: p, velocity: v
+			body = new p2.Body mass: 1, position: p, velocity: v
 			body.damping = 0
 			shape = new p2.Circle 8
 			body.addShape shape
