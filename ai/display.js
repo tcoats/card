@@ -17,7 +17,6 @@
 
       Display.prototype.step = function() {
         var entity, _i, _len, _ref, _results;
-        background(colors.bg);
         _ref = this.entities;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {

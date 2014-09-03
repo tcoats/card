@@ -7,7 +7,7 @@ define ['inject', 'colors'], (inject, colors) ->
 		
 		# Integrate
 		step: =>
-			background colors.bg
+			#background colors.bg
 			for entity in @entities
 				@[entity.n] entity.e() if @[entity.n]?
 		
