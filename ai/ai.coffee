@@ -12,6 +12,8 @@ define ['inject', 'boid', 'unit'], (inject, Boid, Unit) ->
 		setup: =>
 			inject.one('stat notify') 'istouched',
 				(entity, _, istouched) =>
+					return if !entity.ai
+					
 					if istouched
 						inject.one('abs stat') entity, timesincetouch: 0 # reset counter
 					else

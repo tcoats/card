@@ -7,7 +7,7 @@ define ['inject', 'colors'], (inject, colors) ->
 		
 		# Integrate
 		step: =>
-			#background colors.bg
+			background colors.bg
 			for entity in @entities
 				@[entity.n] entity.e() if @[entity.n]?
 		
@@ -25,6 +25,8 @@ define ['inject', 'colors'], (inject, colors) ->
 			fill colors.bg
 			stroke colors.gold
 			ellipse e.phys.b.position[0], e.phys.b.position[1], 16, 16
+			if e.target?
+				line e.phys.b.position[0], e.phys.b.position[1], e.target[0], e.target[1]
 		
 		register: (entity, name) =>
 			entity.d = n: name, e: -> entity

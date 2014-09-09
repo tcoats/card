@@ -5,55 +5,109 @@ define ['inject', 'p2'], (inject, p2) ->
 			@n = n
 		
 		step: =>
+			@separate()
 			@align()
 		
-		align: =>
-			averageposition = [0, 0]
-			distances = []
-			inject.one('each by distance') @e.phys.b.position, 50, (d, e) =>
+		separate: =>
+			averagerepulsion = [0, 0]
+			inject.one('each by distance') @e.phys.b.position, 25, (d, e) =>
 				return if e is @e or !e.ai?
-				distances.push
-					d: d
-					e: e
+				diff = [0, 0]
+				# proportional to distance from other?
+				p2.vec2.sub diff, @e.phys.b.position, e.phys.b.position
+				p2.vec2.normalize diff, diff
+				p2.vec2.add averagerepulsion, averagerepulsion, diff
 			
-			return if distances.length is 0
+			istouched = p2.vec2.len(averagerepulsion) isnt 0
+			inject.one('abs stat') @e, istouched: istouched
+			return if !istouched
 			
-			distances.sort (a,b) -> if a.d >= b.d then 1 else -1
-			force1 = [0, 0]
-			p2.vec2.sub force1, distances[0].e.phys.b.position, @e.phys.b.position
-			normal1 = [0, 0]
-			p2.vec2.normalize normal1, force1
-			ideal1 = [0, 0]
-			p2.vec2.scale ideal1, normal1, 20
-			p2.vec2.sub force1, force1, ideal1
-			p2.vec2.scale force1, force1, 10
-			inject.one('apply force') @e, force1
+			inject.one('scale to max velocity') averagerepulsion
+			force = inject.one('calculate steering') @e.phys.b.velocity, averagerepulsion
+			p2.vec2.scale force, force, 1
+			inject.one('apply force') @e, force
+		
+		align: =>
+			@e.target = null
 			
-			return if distances.length is 1
+			closestunit = null
+			closestdistance = 200
 			
-			force2 = [0, 0]
-			p2.vec2.sub force2, distances[1].e.phys.b.position, @e.phys.b.position
-			normal2 = [0, 0]
-			p2.vec2.normalize normal2, force2
-			ideal2 = [0, 0]
-			p2.vec2.scale ideal2, normal2, 20
-			p2.vec2.sub force2, force2, ideal2
-			p2.vec2.scale force2, force2, 10
-			inject.one('apply force') @e, force2
+			inject.one('each by distance') @e.phys.b.position, 200, (d, e) =>
+				return if e is @e or !e.ai?
+				if d < closestdistance
+					closestunit = e
+					closestdistance = d
+				
+			return if !closestunit?
 			
-			dist = p2.vec2.dist distances[0].e.phys.b.position, distances[1].e.phys.b.position
-			return if dist < 20
+			position = p2.vec2.clone closestunit.phys.b.position
+			p2.vec2.sub position, position, @e.phys.b.position
+			normal = [0, 0]
+			p2.vec2.normalize normal, position
+			p2.vec2.scale normal, normal, 30
+			p2.vec2.sub position, position, normal
+			@e.target = p2.vec2.clone position
+			p2.vec2.add @e.target, @e.target, @e.phys.b.position
 			
-			mid = [0, 0]
-			p2.vec2.add mid, distances[0].e.phys.b.position, distances[1].e.phys.b.position
-			p2.vec2.scale mid, mid, 0.5
-			force3 = [0, 0]
-			p2.vec2.sub force3, mid, @e.phys.b.position
-			p2.vec2.normalize force3, force3
-			p2.vec2.scale force3, force3, 300
-			p2.vec2.scale force3, force3, p2.vec2.dot normal1, normal2
-			inject.one('apply force') @e, force3
+			nextclosestunit = null
+			closestdistance = 50
+			inject.one('each by distance') closestunit.phys.b.position, 35, (d, e) =>
+				return if e is @e or e is closestunit or !e.ai?
+				if d < closestdistance
+					nextclosestunit = e
+					closestdistance = d
 			
+			if nextclosestunit?
+				alignpos = [0, 0]
+				p2.vec2.sub alignpos, closestunit.phys.b.position, nextclosestunit.phys.b.position
+				p2.vec2.normalize alignpos, alignpos
+				p2.vec2.scale alignpos, alignpos, 30
+				
+				anticlockwise = (vec) ->
+					x = vec[0]
+					y = vec[1]
+					[-y, x]
+				
+				point1 = p2.vec2.clone alignpos
+				point2 = [point1[1], -point1[0]]
+				point3 = [-point1[1], point1[0]]
+				
+				p2.vec2.add point1, closestunit.phys.b.position, point1
+				p2.vec2.add point2, closestunit.phys.b.position, point2
+				p2.vec2.add point3, closestunit.phys.b.position, point3
+				
+				p2.vec2.sub point1, point1, @e.phys.b.position
+				p2.vec2.sub point2, point2, @e.phys.b.position
+				p2.vec2.sub point3, point3, @e.phys.b.position
+				
+				len1 = p2.vec2.len point1
+				len2 = p2.vec2.len point2
+				len3 = p2.vec2.len point3
+				
+				target = null
+				if len1 < len2 # and len1 < len3
+				 	target = point1
+				else #if len2 < len3
+				#if len2 < len3
+					target = point2
+				#else
+				#	target = point3
+				
+				@e.target = p2.vec2.clone target
+				p2.vec2.add @e.target, @e.target, @e.phys.b.position
+				
+				
+				inject.one('limit to max velocity') target
+				force = [0, 0]
+				p2.vec2.scale force, target, 10
+				inject.one('apply force') @e, force
+				return
+			
+			force = [0, 0]
+			inject.one('limit to max velocity') position
+			p2.vec2.scale force, position, 20
+			inject.one('apply force') @e, force
 			
 			
 			

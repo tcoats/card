@@ -22,6 +22,9 @@
       AI.prototype.setup = function() {
         return inject.one('stat notify')('istouched', (function(_this) {
           return function(entity, _, istouched) {
+            if (!entity.ai) {
+              return;
+            }
             if (istouched) {
               return inject.one('abs stat')(entity, {
                 timesincetouch: 0

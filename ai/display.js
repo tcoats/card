@@ -17,6 +17,7 @@
 
       Display.prototype.step = function() {
         var entity, _i, _len, _ref, _results;
+        background(colors.bg);
         _ref = this.entities;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -47,7 +48,10 @@
       Display.prototype.unit = function(e) {
         fill(colors.bg);
         stroke(colors.gold);
-        return ellipse(e.phys.b.position[0], e.phys.b.position[1], 16, 16);
+        ellipse(e.phys.b.position[0], e.phys.b.position[1], 16, 16);
+        if (e.target != null) {
+          return line(e.phys.b.position[0], e.phys.b.position[1], e.target[0], e.target[1]);
+        }
       };
 
       Display.prototype.register = function(entity, name) {

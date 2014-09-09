@@ -1,7 +1,7 @@
 define ['inject', 'p2'], (inject, p2) ->
 	class Physics
 		constructor: ->
-			@maxvelocity = 600
+			@maxvelocity = 100
 			@defaultsteeringforce = 1200
 			@entities = []
 			@world = new p2.World gravity: [0, 0]
@@ -10,6 +10,7 @@ define ['inject', 'p2'], (inject, p2) ->
 			inject.bind 'register physics', @register
 			inject.bind 'apply force', @apply
 			inject.bind 'scale to max velocity', @scaletomaxvelocity
+			inject.bind 'limit to max velocity', @limittomaxvelocity
 			inject.bind 'calculate seeking', @calculateseek
 			inject.bind 'calculate steering', @calculatesteering
 			inject.bind 'each by distance', @eachbydistance
@@ -43,7 +44,7 @@ define ['inject', 'p2'], (inject, p2) ->
 		
 		unit: (entity, p, v) =>
 			body = new p2.Body mass: 1, position: p, velocity: v
-			body.damping = 0.5
+			body.damping = 0.9
 			shape = new p2.Circle 8
 			body.addShape shape
 			@world.addBody body
@@ -58,6 +59,12 @@ define ['inject', 'p2'], (inject, p2) ->
 		scaletomaxvelocity: (velocity) =>
 			p2.vec2.normalize velocity, velocity
 			p2.vec2.scale velocity, velocity, @maxvelocity
+		
+		limittomaxvelocity: (velocity) =>
+			len = p2.vec2.len velocity
+			len = Math.min len, @maxvelocity
+			p2.vec2.normalize velocity, velocity
+			p2.vec2.scale velocity, velocity, len
 		
 		_steer: (source, target, scale) =>
 			steering = [0, 0]

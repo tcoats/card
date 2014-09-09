@@ -3,17 +3,14 @@
   define('plugins', ['statistics', 'ai', 'physics', 'display']);
 
   define('game', ['inject', 'plugins'], function(inject) {
-    var e, name, _, _i, _results;
-    _results = [];
+    var u, _, _i;
     for (_ = _i = 0; _i <= 100; _ = ++_i) {
-      e = {};
-      name = 'boid';
-      inject.one('register ai')(e, name);
-      inject.one('register statistics')(e);
-      inject.one('register physics')(e, name, [random(width), random(height)], p5.Vector.random2D().mult(60).array());
-      _results.push(inject.one('register display')(e, name));
+      u = {};
+      inject.one('register ai')(u, 'unit');
+      inject.one('register statistics')(u);
+      inject.one('register physics')(u, 'unit', [random(width), random(height)], [0, 0]);
+      inject.one('register display')(u, 'unit');
     }
-    return _results;
   });
 
   window.setup = function() {
@@ -25,14 +22,18 @@
       }
     });
     return requirejs(['inject', 'game'], function(inject) {
-      var setup, _i, _len, _ref;
+      var render, setup, _i, _len, _ref;
       _ref = inject.many('setup');
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         setup = _ref[_i];
         setup();
       }
-      return window.draw = function() {
+      render = true;
+      window.draw = function() {
         var step, _j, _len1, _ref1, _results;
+        if (!render) {
+          return;
+        }
         _ref1 = inject.many('step');
         _results = [];
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -40,6 +41,9 @@
           _results.push(step());
         }
         return _results;
+      };
+      return window.mousePressed = function() {
+        return render = !render;
       };
     });
   };

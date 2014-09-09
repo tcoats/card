@@ -10,13 +10,14 @@
         this.calculatesteering = __bind(this.calculatesteering, this);
         this.calculateseek = __bind(this.calculateseek, this);
         this._steer = __bind(this._steer, this);
+        this.limittomaxvelocity = __bind(this.limittomaxvelocity, this);
         this.scaletomaxvelocity = __bind(this.scaletomaxvelocity, this);
         this.apply = __bind(this.apply, this);
         this.unit = __bind(this.unit, this);
         this.boid = __bind(this.boid, this);
         this.register = __bind(this.register, this);
         this.step = __bind(this.step, this);
-        this.maxvelocity = 600;
+        this.maxvelocity = 100;
         this.defaultsteeringforce = 1200;
         this.entities = [];
         this.world = new p2.World({
@@ -26,6 +27,7 @@
         inject.bind('register physics', this.register);
         inject.bind('apply force', this.apply);
         inject.bind('scale to max velocity', this.scaletomaxvelocity);
+        inject.bind('limit to max velocity', this.limittomaxvelocity);
         inject.bind('calculate seeking', this.calculateseek);
         inject.bind('calculate steering', this.calculatesteering);
         inject.bind('each by distance', this.eachbydistance);
@@ -94,7 +96,7 @@
           position: p,
           velocity: v
         });
-        body.damping = 0.5;
+        body.damping = 0.9;
         shape = new p2.Circle(8);
         body.addShape(shape);
         this.world.addBody(body);
@@ -114,6 +116,14 @@
       Physics.prototype.scaletomaxvelocity = function(velocity) {
         p2.vec2.normalize(velocity, velocity);
         return p2.vec2.scale(velocity, velocity, this.maxvelocity);
+      };
+
+      Physics.prototype.limittomaxvelocity = function(velocity) {
+        var len;
+        len = p2.vec2.len(velocity);
+        len = Math.min(len, this.maxvelocity);
+        p2.vec2.normalize(velocity, velocity);
+        return p2.vec2.scale(velocity, velocity, len);
       };
 
       Physics.prototype._steer = function(source, target, scale) {
